@@ -1,0 +1,119 @@
+// src/App.jsx
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import AuthEventHandler from "./components/AuthEventHandler";
+import Layout from "./components/Layout";
+import ScrolltoTop from "./components/ScrolltoTop";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+
+import HomePage from "./components/HomePage";
+import About from "./pages/AboutPage";
+import Objectives from "./pages/Objectives";
+import OfficeBearersPage from "./pages/OfficeBearersPage";
+import Patrons from "./pages/PatronsPage";
+import Contact from "./pages/ContactUsPage";
+import DonatePage from "./pages/DonatePage";
+import EventsPage from "./pages/EventsPage";
+
+import AlumniRegistration from "./pages/alumni/AlumniRegistration";
+import AlumniLogin from "./pages/alumni/AlumniLogin";
+import ForgotPassword from "./pages/alumni/ForgotPassword";
+import AlumniProfile from "./pages/alumni/AlumniProfile";
+import AlumniDirectory from "./pages/alumni/AlumniDirectory";
+import AlumniMap from "./pages/alumni/AlumniMap";
+import MyDonationHistory from "./pages/alumni/MyDonationHistory";
+
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
+// ── Redirects logged-in ALUMNI away from login/register ──────────
+const PublicOnlyRoute = ({ children }) => {
+  const { user, authLoading } = useAuth();
+  if (authLoading) return <AppLoader />;
+  if (!user) return children;
+  if (user.isAdmin) return <Navigate to="/alumni/dashboard" replace />;
+  if (user.isApproved) return <Navigate to="/alumni/profile" replace />;
+  return children; // pending alumni can still see registration page
+};
+
+// ── Redirects logged-in ADMIN away from admin login ──────────────
+const AdminPublicOnlyRoute = ({ children }) => {
+  const { user, authLoading } = useAuth();
+  if (authLoading) return <AppLoader />;
+  if (user?.isAdmin && user?.isApproved) return <Navigate to="/alumni/dashboard" replace />;
+  return children;
+};
+
+// ── Full-screen spinner while AuthContext verifies the token ──────
+const AppLoader = () => (
+  <div style={{
+    minHeight: "100vh", display: "flex", flexDirection: "column",
+    alignItems: "center", justifyContent: "center", gap: "16px",
+    background: "#f8f5ee", fontFamily: "Outfit, sans-serif",
+  }}>
+    <div style={{
+      width: "44px", height: "44px", borderRadius: "50%",
+      border: "3px solid #e2e8f0", borderTop: "3px solid #c9a84c",
+      animation: "spin 0.8s linear infinite",
+    }} />
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  </div>
+);
+
+// ── Inner app — has access to useAuth() ──────────────────────────
+function AppRoutes() {
+  const { authLoading } = useAuth();
+
+  // Hold ALL routes until auth is verified to prevent flash-redirects
+  if (authLoading) return <AppLoader />;
+
+  return (
+    <>
+      <AuthEventHandler />
+      <ScrolltoTop />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+
+          {/* PUBLIC */}
+          <Route index element={<HomePage />} />
+          <Route path="about" element={<About />} />
+          <Route path="objectives" element={<Objectives />} />
+          <Route path="patrons" element={<Patrons />} />
+          <Route path="officebearers" element={<OfficeBearersPage />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="events" element={<EventsPage />} />
+          <Route path="donate" element={<DonatePage />} />
+
+          {/* ALUMNI AUTH */}
+          <Route path="alumni/register" element={<PublicOnlyRoute><AlumniRegistration /></PublicOnlyRoute>} />
+          <Route path="alumni/login"    element={<PublicOnlyRoute><AlumniLogin /></PublicOnlyRoute>} />
+          <Route path="alumni/forgot-password" element={<ForgotPassword />} />
+
+          {/* ALUMNI PROTECTED */}
+          <Route path="alumni/profile"   element={<ProtectedRoute><AlumniProfile /></ProtectedRoute>} />
+          <Route path="alumni/directory" element={<ProtectedRoute><AlumniDirectory /></ProtectedRoute>} />
+          <Route path="alumni/map"       element={<ProtectedRoute><AlumniMap /></ProtectedRoute>} />
+          <Route path="alumni/donations" element={<ProtectedRoute><MyDonationHistory /></ProtectedRoute>} />
+
+          {/* ADMIN */}
+          <Route path="admin"            element={<AdminPublicOnlyRoute><AdminLogin /></AdminPublicOnlyRoute>} />
+          <Route path="alumni/dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
