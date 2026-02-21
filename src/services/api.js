@@ -61,6 +61,15 @@ export const authAPI = {
     api.post("/auth/reset-password", { email, otp, newPassword }),
 };
 
+//  ── Admin AUTH ─────────────────────────────────────────────────────────
+export const adminAuthAPI = {
+  login: (data) => api.post("/admin/auth/login", data),
+  register: (data) => api.post("/admin/auth/register", data),
+  getProfile: () => api.get("/admin/auth/profile"),
+  logout: () => { localStorage.removeItem("token"); localStorage.removeItem("alumniUser"); },
+};
+
+
 // ── ALUMNI ───────────────────────────────────────────────────────
 export const alumniAPI = {
   getAllAlumni:   ()          => api.get("/alumni"),
