@@ -64,7 +64,7 @@ const AdminDashboard = () => {
 };
 
     loadData();
-  }, [navigate]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
       setSuccess("Alumni approved successfully!");
       setSelectedItem(null);
       // Refresh list
-      const response = await adminAPI.getAllAlumni();
+      const response = await adminAPI.getAllAlumniForAdmin();
       setAlumniList(response.data.alumni || []);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
       await adminAPI.makeAlumniAdmin(alumniId);
       setSuccess("Admin privileges granted!");
       setSelectedItem(null);
-      const response = await adminAPI.getAllAlumni();
+      const response = await adminAPI.getAllAlumniForAdmin();
       setAlumniList(response.data.alumni || []);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {

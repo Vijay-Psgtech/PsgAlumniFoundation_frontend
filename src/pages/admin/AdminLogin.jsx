@@ -33,7 +33,7 @@ const AdminLogin = () => {
         console.error("Error parsing user:", e);
       }
     }
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

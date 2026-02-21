@@ -3,7 +3,10 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedAdminRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
+
+  // While we are fetching auth state, don't redirect — avoid navigation loops
+  if (authLoading) return null;
 
   if (!user) return <Navigate to="/admin" replace />;
   if (user.isAdmin !== true) return <Navigate to="/alumni/profile" replace />;
