@@ -1,7 +1,7 @@
 // frontend/src/pages/OfficeBearersPage.jsx
 import React from "react";
 import { motion } from "framer-motion";
-import { President, VicePresidents } from "../content/data/OfficeBearersData";
+import { President, VicePresidents } from "../content/data/OfficeBearersData.js";
 
 const OfficeBearersPage = () => {
   const containerVariants = {

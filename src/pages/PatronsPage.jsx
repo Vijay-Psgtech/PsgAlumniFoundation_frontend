@@ -1,7 +1,7 @@
 // frontend/src/pages/PatronsPage.jsx
 import React from "react";
 import { motion } from "framer-motion";
-import { Patrons } from "../content/data/PatronsData";
+import { Patrons } from "../content/data/PatronsData.js";
 
 const PatronsPage = () => {
   const containerVariants = {

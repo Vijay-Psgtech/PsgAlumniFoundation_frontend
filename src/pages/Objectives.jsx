@@ -1,7 +1,7 @@
 // frontend/src/pages/ObjectivesPage.jsx
 import React from "react";
 import { motion } from "framer-motion";
-import { objectivesList, principles } from "../content/data/ObjectivesData";
+import { objectivesList, principles } from "../content/data/ObjectivesData.js";
 
 const ObjectivesPage = () => {
   const containerVariants = {
