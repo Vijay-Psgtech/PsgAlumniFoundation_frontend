@@ -64,7 +64,7 @@ const AlumniProfile = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (locationQuery.length > 2) {
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationQuery}`)
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${locationQuery}`)
           .then((res) => res.json())
           .then((data) => setSuggestions(data));
       }
@@ -75,9 +75,10 @@ const AlumniProfile = () => {
    const handleSelect = (place) => {
     // when user picks a suggestion, update both the query shown in the input
     // and the editable data object so it will be sent to the API
+    console.log('Place',place);
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
-    const city = place.address?.city || place.address?.town || place.address?.village || '';
+    const city = place.address?.city || place.address?.state_district || place.address?.town || place.address?.village || '';
     const country = place.address?.country || '';
 
     setEditData((prev) => ({
