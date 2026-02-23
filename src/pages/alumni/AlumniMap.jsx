@@ -3,11 +3,11 @@ import { alumniAPI } from "../../services/api";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "./alumni.css";
-import MarkerClusterGroup from 'react-leaflet-markercluster';
+import MarkerClusterGroup from "react-leaflet-markercluster";
 
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 // Fix default marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -186,56 +186,97 @@ const AlumniMap = () => {
               ✕
             </button>
 
-            <div className="modal-avatar">
-              {selectedAlumni.firstName?.charAt(0)}
-              {selectedAlumni.lastName?.charAt(0)}
-            </div>
-
-            <h2>
-              {selectedAlumni.firstName} {selectedAlumni.lastName}
-            </h2>
-
-            <div className="modal-info">
-              <div className="info-item">
-                <span className="info-label">Address:</span>
-                <span>{selectedAlumni.address || "Not specified"}</span>
+            {/* Header with gradient background */}
+            <div className="modal-header">
+              <div className="modal-avatar">
+                {selectedAlumni.firstName?.charAt(0)}
+                {selectedAlumni.lastName?.charAt(0)}
               </div>
-
-              <div className="info-item">
-                <span className="info-label">Location:</span>
-                <span>
-                  {selectedAlumni.city}, {selectedAlumni.country}
-                </span>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Department:</span>
-                <span>{selectedAlumni.department}</span>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Graduation:</span>
-                <span>{selectedAlumni.graduationYear}</span>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Company:</span>
-                <span>{selectedAlumni.currentCompany}</span>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Position:</span>
-                <span>{selectedAlumni.jobTitle}</span>
+              <div className="modal-title-group">
+                <h2>
+                  {selectedAlumni.firstName} {selectedAlumni.lastName}
+                </h2>
+                {selectedAlumni.isApproved && (
+                  <span className="modal-badge">✓ Verified</span>
+                )}
               </div>
             </div>
 
-            <div className="modal-actions">
-              <a
-                href={`mailto:${selectedAlumni.email}`}
-                className="btn-contact"
-              >
-                📧 Contact
-              </a>
+            {/* Body with information */}
+            <div className="modal-body">
+              {/* Quick stats */}
+              <div className="modal-meta">
+                <div className="meta-card">
+                  <span className="meta-label">Graduation</span>
+                  <span className="meta-value">
+                    {selectedAlumni.graduationYear}
+                  </span>
+                </div>
+                <div className="meta-card">
+                  <span className="meta-label">Department</span>
+                  <span className="meta-value" style={{ fontSize: "12px" }}>
+                    {selectedAlumni.department || "N/A"}
+                  </span>
+                </div>
+              </div>
+              {/* Detailed information */}
+              <div className="modal-info">
+                <div className="info-item">
+                  <span className="info-label">📧 Email</span>
+                  <span>
+                    <a href={`mailto:${selectedAlumni.email}`}>
+                      {selectedAlumni.email}
+                    </a>
+                  </span>
+                </div>
+
+                <div className="info-item">
+                  <span className="info-label">📍 Location</span>
+                  <span className="location-badge">
+                    📍 {selectedAlumni.city}, {selectedAlumni.country}
+                  </span>
+                </div>
+
+                {selectedAlumni.currentCompany && (
+                  <div className="info-item">
+                    <span className="info-label">🏢 Company</span>
+                    <span>{selectedAlumni.currentCompany}</span>
+                  </div>
+                )}
+
+                {selectedAlumni.jobTitle && (
+                  <div className="info-item">
+                    <span className="info-label">💼 Position</span>
+                    <span>{selectedAlumni.jobTitle}</span>
+                  </div>
+                )}
+
+                {selectedAlumni.linkedin && (
+                  <div className="info-item">
+                    <span className="info-label">💬 LinkedIn</span>
+                    <span>
+                      <a
+                        href={selectedAlumni.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Profile ↗
+                      </a>
+                    </span>
+                  </div>
+                )}
+
+                {selectedAlumni.phone && (
+                  <div className="info-item">
+                    <span className="info-label">📱 Phone</span>
+                    <span>
+                      <a href={`tel:${selectedAlumni.phone}`}>
+                        {selectedAlumni.phone}
+                      </a>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
