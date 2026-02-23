@@ -30,7 +30,7 @@ const AlumniDirectory = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.5 },
     },
   };
 
@@ -638,6 +638,8 @@ const AlumniDirectory = () => {
                   key={alumnus._id}
                   className="alumni-card"
                   variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
                   whileHover={{ y: -8 }}
                 >
                   <div className="card-header">
