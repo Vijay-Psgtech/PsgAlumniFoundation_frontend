@@ -1,9 +1,3 @@
-// src/pages/alumni/AlumniRegistration.jsx
-// ✅ FIXED:
-//   1. Uses AuthContext login() after registration — NavBar updates instantly
-//   2. Shows pending approval screen instead of redirecting to login
-//   3. All localStorage calls replaced with context
-
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,39 +6,58 @@ import { authAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const AlumniRegistration = () => {
-  const navigate   = useNavigate();
-  const { login }  = useAuth();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const [loading,     setLoading]     = useState(false);
-  const [errors,      setErrors]      = useState({});
-  const [registered,  setRegistered]  = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [registered, setRegistered] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [locationQuery, setLocationQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
-    phone: "", department: "", graduationYear: new Date().getFullYear(),
-    rollNumber: "", currentCompany: "", jobTitle: "", country: "", city: "",  coordinates: [], linkedin: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    department: "",
+    graduationYear: new Date().getFullYear(),
+    rollNumber: "",
+    currentCompany: "",
+    jobTitle: "",
+    country: "",
+    city: "",
+    coordinates: [],
+    linkedin: "",
   });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (locationQuery.length > 2) {
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationQuery}`)
+        fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${locationQuery}`,
+        )
           .then((res) => res.json())
           .then((data) => setSuggestions(data));
       }
     }, 300);
     return () => clearTimeout(timeout);
-  },[locationQuery]);
+  }, [locationQuery]);
 
   const handleSelect = (place) => {
-    console.log('Place',place);
+    console.log("Place", place);
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
-    const city = place.address?.city || place.address?.town || place.address?.village || '';
-    const country = place.address?.country || '';
+    const city =
+      place.address?.city ||
+      place.address?.state_district ||
+      place.address?.town ||
+      place.address?.village ||
+      "";
+    const country = place.address?.country || "";
 
     setFormData((prev) => ({
       ...prev,
@@ -58,58 +71,85 @@ const AlumniRegistration = () => {
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    name === 'location' ? setLocationQuery(value) : setFormData((prev) => ({ ...prev, [name]: value }));
+    name === "location"
+      ? setLocationQuery(value)
+      : setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
   const validateStep = useCallback(() => {
     const newErrors = {};
     if (currentStep === 1) {
-      if (!formData.firstName.trim()) newErrors.firstName = "First name required";
-      if (!formData.lastName.trim())  newErrors.lastName  = "Last name required";
-      if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "Valid email required";
-      if (!formData.password)             newErrors.password = "Password required";
-      if (formData.password.length < 6)  newErrors.password = "Minimum 6 characters";
-      if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match";
+      if (!formData.firstName.trim())
+        newErrors.firstName = "First name required";
+      if (!formData.lastName.trim()) newErrors.lastName = "Last name required";
+      if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
+        newErrors.email = "Valid email required";
+      if (!formData.password) newErrors.password = "Password required";
+      if (formData.password.length < 6)
+        newErrors.password = "Minimum 6 characters";
+      if (formData.password !== formData.confirmPassword)
+        newErrors.confirmPassword = "Passwords don't match";
     } else {
-      if (!formData.department.trim()) newErrors.department = "Department required";
-      if (!formData.graduationYear)    newErrors.graduationYear = "Graduation year required";
-      if (!formData.coordinates.length) newErrors.coordinates = "Please select a location from suggestions.";
+      if (!formData.department.trim())
+        newErrors.department = "Department required";
+      if (!formData.graduationYear)
+        newErrors.graduationYear = "Graduation year required";
+      if (!formData.coordinates.length)
+        newErrors.coordinates = "Please select a location from suggestions.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData, currentStep]);
 
   const handleNext = useCallback(() => {
-    if (validateStep()) { setCurrentStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (validateStep()) {
+      setCurrentStep(2);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, [validateStep]);
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    if (!validateStep()) return;
-    setLoading(true);
-    setErrors({});
-    try {
-      const payload = {
-        firstName: formData.firstName.trim(), lastName: formData.lastName.trim(),
-        email: formData.email.toLowerCase().trim(), password: formData.password,
-        phone: formData.phone.trim(), department: formData.department.trim(),
-        graduationYear: Number(formData.graduationYear), rollNumber: formData.rollNumber.trim(),
-        currentCompany: formData.currentCompany.trim(), jobTitle: formData.jobTitle.trim(),
-        country: formData.country.trim(), city: formData.city.trim(), coordinates: formData.coordinates, linkedin: formData.linkedin.trim(),
-      };
-      const response = await authAPI.register(payload);
-      // ✅ FIX: use context login() — NOT localStorage directly
-      if (response.data.token) {
-        login(response.data.alumni, response.data.token);
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!validateStep()) return;
+      setLoading(true);
+      setErrors({});
+      try {
+        const payload = {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.toLowerCase().trim(),
+          password: formData.password,
+          phone: formData.phone.trim(),
+          department: formData.department.trim(),
+          graduationYear: Number(formData.graduationYear),
+          rollNumber: formData.rollNumber.trim(),
+          currentCompany: formData.currentCompany.trim(),
+          jobTitle: formData.jobTitle.trim(),
+          country: formData.country.trim(),
+          city: formData.city.trim(),
+          coordinates: formData.coordinates,
+          linkedin: formData.linkedin.trim(),
+        };
+        const response = await authAPI.register(payload);
+        // ✅ FIX: use context login() — NOT localStorage directly
+        if (response.data.token) {
+          login(response.data.alumni, response.data.token);
+        }
+        setRegistered(true);
+      } catch (err) {
+        setErrors({
+          general:
+            err.response?.data?.message ||
+            "Registration failed. Please try again.",
+        });
+      } finally {
+        setLoading(false);
       }
-      setRegistered(true);
-    } catch (err) {
-      setErrors({ general: err.response?.data?.message || "Registration failed. Please try again." });
-    } finally {
-      setLoading(false);
-    }
-  }, [formData, validateStep, login]);
+    },
+    [formData, validateStep, login],
+  );
 
   // ── Pending Approval Screen ──────────────────────────────────────
   if (registered) {
@@ -137,13 +177,31 @@ const AlumniRegistration = () => {
           <div className="pending-card">
             <div className="pending-icon">⏳</div>
             <h2 className="pending-title">Registration Submitted!</h2>
-            <p className="pending-desc">Your alumni account has been created. An admin will review and approve your application. You'll gain full access once approved.</p>
+            <p className="pending-desc">
+              Your alumni account has been created. An admin will review and
+              approve your application. You'll gain full access once approved.
+            </p>
             <div className="pending-steps">
-              <div className="p-step"><div className="p-dot dot-done"><Check size={13}/></div>Account registered</div>
-              <div className="p-step"><div className="p-dot dot-wait"><Clock size={13}/></div>Waiting for admin approval</div>
-              <div className="p-step"><div className="p-dot dot-next">3</div>Access alumni network &amp; features</div>
+              <div className="p-step">
+                <div className="p-dot dot-done">
+                  <Check size={13} />
+                </div>
+                Account registered
+              </div>
+              <div className="p-step">
+                <div className="p-dot dot-wait">
+                  <Clock size={13} />
+                </div>
+                Waiting for admin approval
+              </div>
+              <div className="p-step">
+                <div className="p-dot dot-next">3</div>Access alumni network
+                &amp; features
+              </div>
             </div>
-            <button className="btn-home" onClick={() => navigate("/")}>Return to Home</button>
+            <button className="btn-home" onClick={() => navigate("/")}>
+              Return to Home
+            </button>
           </div>
         </div>
       </>
@@ -211,25 +269,40 @@ const AlumniRegistration = () => {
         }
       `}</style>
 
-      <motion.div className="reg-section" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:0.6 }}>
+      <motion.div
+        className="reg-section"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="reg-inner">
-
           {/* Header */}
           <div className="reg-head">
-            <motion.div className="reg-icon" initial={{ scale:0 }} animate={{ scale:1 }} transition={{ delay:0.2 }}>
-              <UserPlus size={36}/>
+            <motion.div
+              className="reg-icon"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <UserPlus size={36} />
             </motion.div>
             <h1 className="reg-title">Join Alumni Network</h1>
-            <p className="reg-sub">Register to connect with fellow PSG Tech alumni worldwide</p>
+            <p className="reg-sub">
+              Register to connect with fellow PSG Tech alumni worldwide
+            </p>
           </div>
 
           {/* Step bar */}
           <div className="step-bar">
-            <div className={`s-step ${currentStep >= 1 ? "active" : ""} ${currentStep > 1 ? "done" : ""}`}>
-              <div className="s-circle">{currentStep > 1 ? <Check size={16}/> : "1"}</div>
+            <div
+              className={`s-step ${currentStep >= 1 ? "active" : ""} ${currentStep > 1 ? "done" : ""}`}
+            >
+              <div className="s-circle">
+                {currentStep > 1 ? <Check size={16} /> : "1"}
+              </div>
               <div className="s-label">Personal</div>
             </div>
-            <div className={`s-line ${currentStep > 1 ? "done" : ""}`}/>
+            <div className={`s-line ${currentStep > 1 ? "done" : ""}`} />
             <div className={`s-step ${currentStep >= 2 ? "active" : ""}`}>
               <div className="s-circle">2</div>
               <div className="s-label">Profile</div>
@@ -237,133 +310,315 @@ const AlumniRegistration = () => {
           </div>
 
           {/* Card */}
-          <motion.form onSubmit={handleSubmit} className="reg-card" initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}>
-
+          <motion.form
+            onSubmit={handleSubmit}
+            className="reg-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
             {errors.general && (
-              <div className="err-banner"><AlertCircle size={16}/>{errors.general}</div>
+              <div className="err-banner">
+                <AlertCircle size={16} />
+                {errors.general}
+              </div>
             )}
 
             {/* ── Step 1 ── */}
             {currentStep === 1 && (
-              <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }}>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
                 <p className="sec-title">Personal Information</p>
 
                 <div className="f-row">
                   <div className="f-grp">
                     <label className="f-lbl">First Name *</label>
-                    <input type="text" name="firstName" className={`f-inp ${errors.firstName?"err":""}`} placeholder="John" value={formData.firstName} onChange={handleChange}/>
-                    {errors.firstName && <div className="f-err"><AlertCircle size={12}/>{errors.firstName}</div>}
+                    <input
+                      type="text"
+                      name="firstName"
+                      className={`f-inp ${errors.firstName ? "err" : ""}`}
+                      placeholder="John"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                    />
+                    {errors.firstName && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.firstName}
+                      </div>
+                    )}
                   </div>
                   <div className="f-grp">
                     <label className="f-lbl">Last Name *</label>
-                    <input type="text" name="lastName" className={`f-inp ${errors.lastName?"err":""}`} placeholder="Doe" value={formData.lastName} onChange={handleChange}/>
-                    {errors.lastName && <div className="f-err"><AlertCircle size={12}/>{errors.lastName}</div>}
+                    <input
+                      type="text"
+                      name="lastName"
+                      className={`f-inp ${errors.lastName ? "err" : ""}`}
+                      placeholder="Doe"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                    />
+                    {errors.lastName && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.lastName}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="f-row full">
                   <div className="f-grp">
                     <label className="f-lbl">Email Address *</label>
-                    <input type="email" name="email" className={`f-inp ${errors.email?"err":""}`} placeholder="your.email@example.com" value={formData.email} onChange={handleChange} autoComplete="email"/>
-                    {errors.email && <div className="f-err"><AlertCircle size={12}/>{errors.email}</div>}
+                    <input
+                      type="email"
+                      name="email"
+                      className={`f-inp ${errors.email ? "err" : ""}`}
+                      placeholder="your.email@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      autoComplete="email"
+                    />
+                    {errors.email && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.email}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="f-row">
                   <div className="f-grp">
                     <label className="f-lbl">Password *</label>
-                    <input type="password" name="password" className={`f-inp ${errors.password?"err":""}`} placeholder="Min. 6 characters" value={formData.password} onChange={handleChange} autoComplete="new-password"/>
-                    {errors.password && <div className="f-err"><AlertCircle size={12}/>{errors.password}</div>}
+                    <input
+                      type="password"
+                      name="password"
+                      className={`f-inp ${errors.password ? "err" : ""}`}
+                      placeholder="Min. 6 characters"
+                      value={formData.password}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                    />
+                    {errors.password && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.password}
+                      </div>
+                    )}
                   </div>
                   <div className="f-grp">
                     <label className="f-lbl">Confirm Password *</label>
-                    <input type="password" name="confirmPassword" className={`f-inp ${errors.confirmPassword?"err":""}`} placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} autoComplete="new-password"/>
-                    {errors.confirmPassword && <div className="f-err"><AlertCircle size={12}/>{errors.confirmPassword}</div>}
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      className={`f-inp ${errors.confirmPassword ? "err" : ""}`}
+                      placeholder="Re-enter password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                    />
+                    {errors.confirmPassword && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.confirmPassword}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="f-row full">
                   <div className="f-grp">
                     <label className="f-lbl">Phone (Optional)</label>
-                    <input type="tel" name="phone" className="f-inp" placeholder="+91 98765 43210" value={formData.phone} onChange={handleChange}/>
+                    <input
+                      type="tel"
+                      name="phone"
+                      className="f-inp"
+                      placeholder="+91 98765 43210"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
                 <div className="f-actions">
-                  <button type="button" className="btn-next" onClick={handleNext}>Next Step →</button>
+                  <button
+                    type="button"
+                    className="btn-next"
+                    onClick={handleNext}
+                  >
+                    Next Step →
+                  </button>
                 </div>
               </motion.div>
             )}
 
             {/* ── Step 2 ── */}
             {currentStep === 2 && (
-              <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }}>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
                 <p className="sec-title">Academic Information</p>
 
                 <div className="f-row">
                   <div className="f-grp">
                     <label className="f-lbl">Department *</label>
-                    <input type="text" name="department" className={`f-inp ${errors.department?"err":""}`} placeholder="Computer Science" value={formData.department} onChange={handleChange}/>
-                    {errors.department && <div className="f-err"><AlertCircle size={12}/>{errors.department}</div>}
+                    <input
+                      type="text"
+                      name="department"
+                      className={`f-inp ${errors.department ? "err" : ""}`}
+                      placeholder="Computer Science"
+                      value={formData.department}
+                      onChange={handleChange}
+                    />
+                    {errors.department && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.department}
+                      </div>
+                    )}
                   </div>
                   <div className="f-grp">
                     <label className="f-lbl">Graduation Year *</label>
-                    <input type="number" name="graduationYear" className={`f-inp ${errors.graduationYear?"err":""}`} placeholder="2020" value={formData.graduationYear} onChange={handleChange} min="1950" max="2030"/>
-                    {errors.graduationYear && <div className="f-err"><AlertCircle size={12}/>{errors.graduationYear}</div>}
+                    <input
+                      type="number"
+                      name="graduationYear"
+                      className={`f-inp ${errors.graduationYear ? "err" : ""}`}
+                      placeholder="2020"
+                      value={formData.graduationYear}
+                      onChange={handleChange}
+                      min="1950"
+                      max="2030"
+                    />
+                    {errors.graduationYear && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.graduationYear}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="f-row full">
                   <div className="f-grp">
                     <label className="f-lbl">Roll Number (Optional)</label>
-                    <input type="text" name="rollNumber" className="f-inp" placeholder="e.g. 20CSE001" value={formData.rollNumber} onChange={handleChange}/>
+                    <input
+                      type="text"
+                      name="rollNumber"
+                      className="f-inp"
+                      placeholder="e.g. 20CSE001"
+                      value={formData.rollNumber}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
-                <p className="sec-title" style={{ marginTop:"24px" }}>Professional &amp; Location</p>
+                <p className="sec-title" style={{ marginTop: "24px" }}>
+                  Professional &amp; Location
+                </p>
 
                 <div className="f-row">
                   <div className="f-grp">
                     <label className="f-lbl">Company (Optional)</label>
-                    <input type="text" name="currentCompany" className="f-inp" placeholder="Company name" value={formData.currentCompany} onChange={handleChange}/>
+                    <input
+                      type="text"
+                      name="currentCompany"
+                      className="f-inp"
+                      placeholder="Company name"
+                      value={formData.currentCompany}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="f-grp">
                     <label className="f-lbl">Job Title (Optional)</label>
-                    <input type="text" name="jobTitle" className="f-inp" placeholder="Software Engineer" value={formData.jobTitle} onChange={handleChange}/>
+                    <input
+                      type="text"
+                      name="jobTitle"
+                      className="f-inp"
+                      placeholder="Software Engineer"
+                      value={formData.jobTitle}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
                 <div className="f-row full">
                   <div className="f-grp location-group">
                     <label className="f-lbl">Location *</label>
-                    <input type="text" name="location" className={`f-inp ${errors.coordinates?"err":""}`} placeholder="Type to search city..." value={locationQuery} onChange={handleChange} autoComplete="off"/>
+                    <input
+                      type="text"
+                      name="location"
+                      className={`f-inp ${errors.coordinates ? "err" : ""}`}
+                      placeholder="Type to search city..."
+                      value={locationQuery}
+                      onChange={handleChange}
+                      autoComplete="off"
+                    />
                     {suggestions.length > 0 && (
                       <div className="reg-location-suggestions">
                         {suggestions.map((place) => (
-                          <div key={place.place_id} className="reg-location-item" onClick={() => handleSelect(place)}>
+                          <div
+                            key={place.place_id}
+                            className="reg-location-item"
+                            onClick={() => handleSelect(place)}
+                          >
                             {place.display_name}
-                          </div>  
+                          </div>
                         ))}
                       </div>
                     )}
-                    {errors.coordinates && <div className="f-err"><AlertCircle size={12}/>{errors.coordinates}</div>}
+                    {errors.coordinates && (
+                      <div className="f-err">
+                        <AlertCircle size={12} />
+                        {errors.coordinates}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="f-row full">
                   <div className="f-grp">
                     <label className="f-lbl">LinkedIn (Optional)</label>
-                    <input type="url" name="linkedin" className="f-inp" placeholder="https://linkedin.com/in/username" value={formData.linkedin} onChange={handleChange}/>
+                    <input
+                      type="url"
+                      name="linkedin"
+                      className="f-inp"
+                      placeholder="https://linkedin.com/in/username"
+                      value={formData.linkedin}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
                 <div className="f-actions">
-                  <button type="button" className="btn-bk" onClick={() => setCurrentStep(1)}>← Back</button>
+                  <button
+                    type="button"
+                    className="btn-bk"
+                    onClick={() => setCurrentStep(1)}
+                  >
+                    ← Back
+                  </button>
                   <button type="submit" className="btn-sub" disabled={loading}>
                     {loading ? (
-                      <><div style={{ width:"16px",height:"16px",borderRadius:"50%",border:"2px solid white",borderTop:"2px solid transparent",animation:"spin 0.8s linear infinite" }}/> Registering…</>
+                      <>
+                        <div
+                          style={{
+                            width: "16px",
+                            height: "16px",
+                            borderRadius: "50%",
+                            border: "2px solid white",
+                            borderTop: "2px solid transparent",
+                            animation: "spin 0.8s linear infinite",
+                          }}
+                        />{" "}
+                        Registering…
+                      </>
                     ) : (
-                      <><Check size={16}/> Complete Registration</>
+                      <>
+                        <Check size={16} /> Complete Registration
+                      </>
                     )}
                   </button>
                 </div>
@@ -371,7 +626,8 @@ const AlumniRegistration = () => {
             )}
 
             <div className="reg-foot">
-              Already have an account? <Link to="/alumni/login">Sign in here</Link>
+              Already have an account?{" "}
+              <Link to="/alumni/login">Sign in here</Link>
             </div>
           </motion.form>
         </div>
