@@ -4,7 +4,7 @@
 //   2. Shows pending approval screen instead of redirecting to login
 //   3. All localStorage calls replaced with context
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { UserPlus, AlertCircle, Check, Clock } from "lucide-react";
@@ -19,16 +19,46 @@ const AlumniRegistration = () => {
   const [errors,      setErrors]      = useState({});
   const [registered,  setRegistered]  = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
     phone: "", department: "", graduationYear: new Date().getFullYear(),
-    rollNumber: "", currentCompany: "", jobTitle: "", country: "", city: "", linkedin: "",
+    rollNumber: "", currentCompany: "", jobTitle: "", country: "", city: "",  coordinates: [], linkedin: "",
   });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (locationQuery.length > 2) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationQuery}`)
+          .then((res) => res.json())
+          .then((data) => setSuggestions(data));
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
+  },[locationQuery]);
+
+  const handleSelect = (place) => {
+    console.log('Place',place);
+    const lat = parseFloat(place.lat);
+    const lon = parseFloat(place.lon);
+    const city = place.address?.city || place.address?.town || place.address?.village || '';
+    const country = place.address?.country || '';
+
+    setFormData((prev) => ({
+      ...prev,
+      city: city || place.display_name,
+      country: country || place.display_name.split(",").slice(-1)[0].trim(),
+      coordinates: [lon, lat],
+    }));
+    setLocationQuery(place.display_name);
+    setSuggestions([]);
+  };
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    name === 'location' ? setLocationQuery(value) : setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
@@ -44,8 +74,7 @@ const AlumniRegistration = () => {
     } else {
       if (!formData.department.trim()) newErrors.department = "Department required";
       if (!formData.graduationYear)    newErrors.graduationYear = "Graduation year required";
-      if (!formData.country.trim())    newErrors.country = "Country required";
-      if (!formData.city.trim())       newErrors.city    = "City required";
+      if (!formData.coordinates.length) newErrors.coordinates = "Please select a location from suggestions.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -67,7 +96,7 @@ const AlumniRegistration = () => {
         phone: formData.phone.trim(), department: formData.department.trim(),
         graduationYear: Number(formData.graduationYear), rollNumber: formData.rollNumber.trim(),
         currentCompany: formData.currentCompany.trim(), jobTitle: formData.jobTitle.trim(),
-        country: formData.country.trim(), city: formData.city.trim(), linkedin: formData.linkedin.trim(),
+        country: formData.country.trim(), city: formData.city.trim(), coordinates: formData.coordinates, linkedin: formData.linkedin.trim(),
       };
       const response = await authAPI.register(payload);
       // ✅ FIX: use context login() — NOT localStorage directly
@@ -299,16 +328,20 @@ const AlumniRegistration = () => {
                   </div>
                 </div>
 
-                <div className="f-row">
-                  <div className="f-grp">
-                    <label className="f-lbl">Country *</label>
-                    <input type="text" name="country" className={`f-inp ${errors.country?"err":""}`} placeholder="India" value={formData.country} onChange={handleChange}/>
-                    {errors.country && <div className="f-err"><AlertCircle size={12}/>{errors.country}</div>}
-                  </div>
-                  <div className="f-grp">
-                    <label className="f-lbl">City *</label>
-                    <input type="text" name="city" className={`f-inp ${errors.city?"err":""}`} placeholder="Coimbatore" value={formData.city} onChange={handleChange}/>
-                    {errors.city && <div className="f-err"><AlertCircle size={12}/>{errors.city}</div>}
+                <div className="f-row full">
+                  <div className="f-grp" style={{ position:"relative" }}>
+                    <label className="f-lbl">Location *</label>
+                    <input type="text" name="location" className={`f-inp ${errors.coordinates?"err":""}`} placeholder="Type to search city..." value={locationQuery} onChange={handleChange} autoComplete="off"/>
+                    {suggestions.length > 0 && (
+                      <div style={{ position:"absolute", top:"100%", left:0, right:0, background:"white", border:"1px solid #e0e6f0", borderRadius:"8px", marginTop:"4px", zIndex:10, maxHeight:"150px", overflowY:"auto" }}>
+                        {suggestions.map((place) => (
+                          <div key={place.place_id} onClick={() => handleSelect(place)} style={{ padding:"10px", cursor:"pointer", borderBottom:"1px solid #f0f0f0" }}>
+                            {place.display_name}
+                          </div>  
+                        ))}
+                      </div>
+                    )}
+                    {errors.coordinates && <div className="f-err"><AlertCircle size={12}/>{errors.coordinates}</div>}
                   </div>
                 </div>
 
