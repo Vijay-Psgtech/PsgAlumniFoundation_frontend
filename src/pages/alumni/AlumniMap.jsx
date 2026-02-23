@@ -3,16 +3,17 @@ import { alumniAPI } from "../../services/api";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "./alumni.css";
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 // Fix default marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
-  iconUrl:
-    "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 });
 
 // Auto fit map bounds
@@ -24,8 +25,14 @@ const FitBounds = ({ alumni }) => {
 
     const bounds = L.latLngBounds(
       alumni
-        .filter((a) => a.latitude && a.longitude)
-        .map((a) => [a.latitude, a.longitude])
+        .filter(
+          (a) =>
+            a.location &&
+            a.location.coordinates &&
+            a.location.coordinates[1] &&
+            a.location.coordinates[0],
+        )
+        .map((a) => [a.location.coordinates[1], a.location.coordinates[0]]),
     );
 
     if (bounds.isValid()) {
@@ -73,7 +80,11 @@ const AlumniMap = () => {
 
   const validAlumni = useMemo(() => {
     return mapData.alumni.filter(
-      (a) => a.latitude && a.longitude
+      (a) =>
+        a.location &&
+        a.location.coordinates &&
+        a.location.coordinates[1] &&
+        a.location.coordinates[0],
     );
   }, [mapData.alumni]);
 
@@ -102,17 +113,13 @@ const AlumniMap = () => {
       {/* Header */}
       <div className="map-header">
         <h1>Alumni World Map</h1>
-        <p className="subtitle">
-          Click on markers to explore alumni locations
-        </p>
+        <p className="subtitle">Click on markers to explore alumni locations</p>
       </div>
 
       {/* Stats */}
       <div className="map-stats">
         <div className="stat-card">
-          <div className="stat-number">
-            {mapData.stats?.totalAlumni || 0}
-          </div>
+          <div className="stat-number">{mapData.stats?.totalAlumni || 0}</div>
           <div className="stat-label">Alumni Located</div>
         </div>
         <div className="stat-card">
@@ -143,24 +150,28 @@ const AlumniMap = () => {
           />
 
           <FitBounds alumni={validAlumni} />
-
-          {validAlumni.map((alumnus) => (
-            <Marker
-              key={alumnus._id}
-              position={[alumnus.latitude, alumnus.longitude]}
-              eventHandlers={{
-                click: () => setSelectedAlumni(alumnus),
-              }}
-            >
-              <Popup>
-                <strong>
-                  {alumnus.firstName} {alumnus.lastName}
-                </strong>
-                <br />
-                {alumnus.city}, {alumnus.country}
-              </Popup>
-            </Marker>
-          ))}
+          <MarkerClusterGroup>
+            {validAlumni.map((alumnus) => (
+              <Marker
+                key={alumnus._id}
+                position={[
+                  alumnus.location.coordinates[1],
+                  alumnus.location.coordinates[0],
+                ]}
+                eventHandlers={{
+                  click: () => setSelectedAlumni(alumnus),
+                }}
+              >
+                <Popup>
+                  <strong>
+                    {alumnus.firstName} {alumnus.lastName}
+                  </strong>
+                  <br />
+                  {alumnus.city}, {alumnus.country}
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
         </MapContainer>
       </div>
 
@@ -187,9 +198,7 @@ const AlumniMap = () => {
             <div className="modal-info">
               <div className="info-item">
                 <span className="info-label">Address:</span>
-                <span>
-                  {selectedAlumni.address || "Not specified"}
-                </span>
+                <span>{selectedAlumni.address || "Not specified"}</span>
               </div>
 
               <div className="info-item">
