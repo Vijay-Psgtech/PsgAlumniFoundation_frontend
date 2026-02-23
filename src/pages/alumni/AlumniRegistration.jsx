@@ -183,10 +183,15 @@ const AlumniRegistration = () => {
         .f-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
         .f-row.full { grid-template-columns:1fr; }
         .f-grp { display:flex; flex-direction:column; gap:7px; }
+        .f-grp.location-group { position:relative; }
         .f-lbl { font-size:12px; font-weight:600; color:#0c0e1a; text-transform:uppercase; letter-spacing:0.05em; }
         .f-inp { padding:11px 13px; border:1px solid #e0e6f0; border-radius:8px; font-family:'Outfit',sans-serif; font-size:14px; color:#0c0e1a; background:#fafbfc; transition:all 0.3s; box-sizing:border-box; width:100%; }
         .f-inp:focus { outline:none; border-color:#667eea; background:white; box-shadow:0 0 0 3px rgba(102,126,234,0.1); }
         .f-inp.err { border-color:#dc2626; }
+        .reg-location-suggestions { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #e0e6f0; border-radius:8px; margin-top:6px; z-index:10; max-height:200px; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+        .reg-location-item { padding:12px 13px; cursor:pointer; border-bottom:1px solid #f0f3f9; font-size:13px; color:#0c0e1a; transition:background 0.2s; }
+        .reg-location-item:last-child { border-bottom:none; }
+        .reg-location-item:hover { background:#f8f9fc; color:#667eea; font-weight:600; }
         .f-err { font-size:12px; color:#dc2626; display:flex; align-items:center; gap:5px; }
         .err-banner { background:#fee2e2; border:1px solid #fecaca; border-radius:8px; padding:12px 14px; color:#991b1b; font-size:13px; display:flex; align-items:center; gap:8px; margin-bottom:20px; }
         .f-actions { display:flex; gap:12px; margin-top:28px; }
@@ -329,13 +334,13 @@ const AlumniRegistration = () => {
                 </div>
 
                 <div className="f-row full">
-                  <div className="f-grp" style={{ position:"relative" }}>
+                  <div className="f-grp location-group">
                     <label className="f-lbl">Location *</label>
                     <input type="text" name="location" className={`f-inp ${errors.coordinates?"err":""}`} placeholder="Type to search city..." value={locationQuery} onChange={handleChange} autoComplete="off"/>
                     {suggestions.length > 0 && (
-                      <div style={{ position:"absolute", top:"100%", left:0, right:0, background:"white", border:"1px solid #e0e6f0", borderRadius:"8px", marginTop:"4px", zIndex:10, maxHeight:"150px", overflowY:"auto" }}>
+                      <div className="reg-location-suggestions">
                         {suggestions.map((place) => (
-                          <div key={place.place_id} onClick={() => handleSelect(place)} style={{ padding:"10px", cursor:"pointer", borderBottom:"1px solid #f0f0f0" }}>
+                          <div key={place.place_id} className="reg-location-item" onClick={() => handleSelect(place)}>
                             {place.display_name}
                           </div>  
                         ))}

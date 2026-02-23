@@ -24,10 +24,71 @@ const AlumniProfile = () => {
   const [success, setSuccess] = useState("");
   const [profileData, setProfileData] = useState(null);
   const [editData, setEditData] = useState({});
+  const [locationQuery, setLocationQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  // helper to convert whatever the backend returns into a shape usable by the UI
+  const normalizeAlumni = (alumni) => {
+    if (!alumni) return alumni;
+    let locString = "";
+    let coords = [];
+
+    if (alumni.location) {
+      if (typeof alumni.location === "object") {
+        coords = Array.isArray(alumni.location.coordinates)
+          ? alumni.location.coordinates
+          : alumni.coordinates || [];
+        locString = alumni.location.display_name ||
+          (alumni.city && alumni.country ? `${alumni.city}, ${alumni.country}` : alumni.city || alumni.country || "");
+      } else {
+        locString = alumni.location;
+        coords = alumni.coordinates || [];
+      }
+    } else {
+      locString = alumni.city && alumni.country ? `${alumni.city}, ${alumni.country}` : alumni.city || alumni.country || "";
+      coords = alumni.coordinates || [];
+    }
+
+    return {
+      ...alumni,
+      location: locString,
+      coordinates: coords,
+    };
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (locationQuery.length > 2) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationQuery}`)
+          .then((res) => res.json())
+          .then((data) => setSuggestions(data));
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
+  },[locationQuery]);
+
+   const handleSelect = (place) => {
+    // when user picks a suggestion, update both the query shown in the input
+    // and the editable data object so it will be sent to the API
+    const lat = parseFloat(place.lat);
+    const lon = parseFloat(place.lon);
+    const city = place.address?.city || place.address?.town || place.address?.village || '';
+    const country = place.address?.country || '';
+
+    setEditData((prev) => ({
+      ...prev,
+      city: city || place.display_name,
+      country: country || place.display_name.split(",").slice(-1)[0].trim(),
+      location: place.display_name,
+      coordinates: [lon, lat],
+    }));
+    setLocationQuery(place.display_name);
+    setSuggestions([]);
   };
 
   // ✅ FIX 2: Defensive data extraction — tries multiple response shapes
@@ -48,8 +109,11 @@ const AlumniProfile = () => {
         return;
       }
 
-      setProfileData(alumni);
-      setEditData(alumni);
+      const normalized = normalizeAlumni(alumni);
+
+      setProfileData(normalized);
+      setEditData(normalized);
+      setLocationQuery(normalized.location || "");
     } catch (err) {
       console.error("Error loading profile:", err);
       if (err.response?.status === 401) {
@@ -68,16 +132,32 @@ const AlumniProfile = () => {
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'location') {
+      setLocationQuery(value);
+      // clear coords until a suggestion is chosen again
+      setEditData((prev) => ({ ...prev, location: value, coordinates: [] }));
+    } else {
+      setEditData((prev) => ({ ...prev, [name]: value }));
+    }
   }, []);
 
   const handleSaveProfile = useCallback(async () => {
+    // require that a typed location be matched with coords
+    if (locationQuery && !editData.coordinates?.length) {
+      setError("Please select a location from suggestions.");
+      return;
+    }
+
     try {
       setError("");
       setSuccess("");
-      const response = await alumniAPI.updateProfile(profileData._id, editData);
-      const updated = extractAlumni(response.data);
-      setProfileData(updated || editData);
+      // ensure the text input's query (which may have changed without selection)
+      // is included; coordinates array remains whatever was set by handleSelect
+      const payload = { ...editData, location: locationQuery };
+      const response = await alumniAPI.updateProfile(profileData._id, payload);
+      const updatedRaw = extractAlumni(response.data);
+      const updated = normalizeAlumni(updatedRaw || {});
+      setProfileData(updated || payload);
       setIsEditing(false);
       setSuccess("Profile updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
@@ -85,7 +165,7 @@ const AlumniProfile = () => {
       console.error("Save error:", err);
       setError(err.response?.data?.message || "Failed to save profile");
     }
-  }, [profileData?._id, editData]);
+  }, [profileData?._id, editData, locationQuery]);
 
   const handleCancel = useCallback(() => {
     setEditData(profileData);
@@ -301,18 +381,29 @@ const AlumniProfile = () => {
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .form-row.full { grid-template-columns: 1fr; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.location-group { position: relative; }
         .form-label {
           font-size: 12px; font-weight: 600; color: #0c0e1a;
           text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .location-suggestions {
+          position: absolute; top: 100%; left: 0; right: 0;
+          background: white; border: 1px solid #e0e6f0; border-radius: 8px;
+          margin-top: 6px; z-index: 10; max-height: 200px; overflow-y: auto;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .location-suggestion-item {
+          padding: 12px 14px; cursor: pointer; border-bottom: 1px solid #f0f3f9;
+          font-size: 13px; color: #0c0e1a; transition: background 0.2s;
+        }
+        .location-suggestion-item:last-child { border-bottom: none; }
+        .location-suggestion-item:hover {
+          background: #f8f9fc; color: #667eea; font-weight: 600;
         }
         .form-input {
           padding: 12px 14px; border: 1px solid #e0e6f0; border-radius: 8px;
           font-family: 'Outfit', sans-serif; font-size: 14px; color: #0c0e1a;
           background: #fafbfc; transition: all 0.3s; box-sizing: border-box; width: 100%;
-        }
-        .form-input:focus {
-          outline: none; border-color: #667eea; background: white;
-          box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
         }
 
         .form-actions {
@@ -499,18 +590,20 @@ const AlumniProfile = () => {
 
                 <div className="form-section">
                   <h3>📍 Location</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Country</label>
-                      <input type="text" name="country" className="form-input"
-                        value={editData.country || ""} onChange={handleChange} />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">City</label>
-                      <input type="text" name="city" className="form-input"
-                        value={editData.city || ""} onChange={handleChange} />
-                    </div>
-                  </div>
+                  <div className="form-group location-group">
+                    <label className="form-label">Location</label>
+                    <input type="text" name="location" className="form-input"
+                    value={locationQuery} onChange={handleChange} placeholder="Search location..." />
+                    {suggestions.length > 0 && (
+                      <div className="location-suggestions">
+                        {suggestions.map((place) => (
+                          <div key={place.place_id} className="location-suggestion-item" onClick={() => handleSelect(place)}>
+                            {place.display_name}
+                          </div>  
+                        ))}
+                      </div>
+                    )}
+                  </div> 
                 </div>
 
                 <div className="form-actions">
@@ -588,15 +681,9 @@ const AlumniProfile = () => {
                 <div className="info-section">
                   <h3>📍 Location</h3>
                   <div className="info-row">
-                    <span className="info-label">Country</span>
+                    <span className="info-label">Location</span>
                     <span className="info-value">
-                      {profileData.country || <span className="info-empty">Not provided</span>}
-                    </span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">City</span>
-                    <span className="info-value">
-                      {profileData.city || <span className="info-empty">Not provided</span>}
+                      {profileData.location || <span className="info-empty">Not provided</span>}
                     </span>
                   </div>
                 </div>
