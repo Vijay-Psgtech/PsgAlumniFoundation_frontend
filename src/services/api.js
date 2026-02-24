@@ -109,6 +109,27 @@ export const contactAPI = {
   subscribeNewsletter: (email) => api.post("/contact/subscribe", { email }),
 };
 
+// ── EVENTS API ──────────────────────────────────────────────────────────────
+// ✅ For Events Page, Calendar, Detail Page
+export const eventsAPI = {
+  getAll: () => api.get("/events"),
+  getById: (id) => api.get(`/events/${id}`),
+  create: (data) => api.post("/events", data),
+  update: (id, data) => api.put(`/events/${id}`, data),
+  delete: (id) => api.delete(`/events/${id}`),
+};
+
+// ── ALBUMS API ──────────────────────────────────────────────────────────────
+// ✅ For Year Albums Page
+export const albumsAPI = {
+  getAll: () => api.get("/albums"),
+  getByYear: (year) => api.get(`/albums/year/${year}`),
+  create: (data) => api.post("/albums", data),
+  update: (id, data) => api.put(`/albums/${id}`, data),
+  delete: (id) => api.delete(`/albums/${id}`),
+};
+
+
 // ── UTILS (read-only helpers) ─────────────────────────────────────
 export const isAuthenticated = () => !!localStorage.getItem("token");
 
