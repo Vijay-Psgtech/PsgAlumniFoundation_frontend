@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
 import { authAPI } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { login: authLogin } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -27,7 +29,7 @@ const AdminLogin = () => {
       try {
         const user = JSON.parse(alumniUser);
         if (user.isAdmin) {
-          navigate("/alumni/dashboard");
+          navigate("/admin/dashboard");
         }
       } catch (e) {
         console.error("Error parsing user:", e);
@@ -71,7 +73,8 @@ const AdminLogin = () => {
         localStorage.setItem("alumniUser", JSON.stringify(alumni));
 
         console.log("✅ Admin login successful");
-        navigate("/alumni/dashboard");
+        authLogin(alumni, token);
+        navigate("/admin/dashboard");
       } else {
         setError("Login failed: No token received");
       }

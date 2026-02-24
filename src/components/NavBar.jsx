@@ -49,7 +49,7 @@ export default function NavBar() {
         user ? { label: "Alumni Map", path: "/alumni/map" } : null,
         user ? { label: "My Profile", path: "/alumni/profile" } : null,
         user ? { label: "My Donations", path: "/alumni/donations" } : null,
-        user?.isAdmin ? { label: "Admin Dashboard", path: "/alumni/dashboard" } : null,
+        user?.isAdmin ? { label: "Admin Dashboard", path: "/admin/dashboard" } : null,
       ].filter(Boolean),
     },
   ];
@@ -447,7 +447,7 @@ export default function NavBar() {
                         💳 My Donations
                       </NavLink>
                       {user.isAdmin && (
-                        <NavLink to="/alumni/dashboard" onClick={() => setUserMenuOpen(false)} className="ud-item">
+                        <NavLink to="/admin/dashboard" onClick={() => setUserMenuOpen(false)} className="ud-item">
                           <LayoutDashboard size={14} style={{ color: "var(--gold)" }} /> Admin Dashboard
                         </NavLink>
                       )}
@@ -539,7 +539,7 @@ export default function NavBar() {
                   💳 My Donations
                 </NavLink>
                 {user.isAdmin && (
-                  <NavLink to="/alumni/dashboard" onClick={closeAll} className="m-link">
+                  <NavLink to="/admin/dashboard" onClick={closeAll} className="m-link">
                     <LayoutDashboard size={15} /> Admin Dashboard
                   </NavLink>
                 )}

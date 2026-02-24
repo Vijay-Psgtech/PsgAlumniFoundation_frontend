@@ -52,10 +52,25 @@ export function AuthProvider({ children }) {
       .finally(() => setAuthLoading(false));
   }, []);
 
-  const login = useCallback((userData, token) => {
+  const login = useCallback(async(userData, token) => {
     localStorage.setItem("alumniUser", JSON.stringify(userData));
     localStorage.setItem("token", token);
     setUser(userData);
+    try {
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const freshUser = data?.alumni ?? data?.user ?? data ?? null;
+      if (freshUser) {
+        localStorage.setItem("alumniUser", JSON.stringify(freshUser));
+        setUser(freshUser);
+      }
+    }
+  } catch (err) {
+    console.error("Failed to refresh user after login", err);
+  }
   }, []);
 
   const logout = useCallback(() => {
