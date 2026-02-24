@@ -1,9 +1,3 @@
-// src/components/NavBar.jsx — PSG Tech Alumni Foundation
-// ✅ FIXED: Now uses AuthContext instead of raw localStorage reads
-//   - Login state updates instantly without page refresh
-//   - Logout clears context state properly
-//   - All other styling unchanged
-
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard } from "lucide-react";
@@ -12,7 +6,6 @@ import { useAuth } from "../context/AuthContext";
 import Logo from "../assets/Images/staffImages/psg_logo.jpg";
 
 export default function NavBar() {
-  // ✅ FIX: Use AuthContext — user state now updates instantly on login/logout
   const { user, logout } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -20,15 +13,17 @@ export default function NavBar() {
   const [navVisible, setNavVisible] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [eventsOpen, setEventsOpen] = useState(false);
   const [alumniOpen, setAlumniOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
+  const [mobileEventsOpen, setMobileEventsOpen] = useState(false);
   const [mobileAlumniOpen, setMobileAlumniOpen] = useState(false);
   const navRef = useRef(null);
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ Alumni submenu — conditional based on login status
+  // ✅ FIXED: All items are proper objects — no raw JSX in array
   const navItems = [
     { label: "Home", path: "/" },
     {
@@ -40,7 +35,14 @@ export default function NavBar() {
       ],
     },
     { label: "Objectives", path: "/objectives" },
-    { label: "Events", path: "/events" },
+    {
+      label: "Events",
+      submenu: [
+        { label: "All Events", path: "/events" },
+        { label: "Calendar", path: "/events/calendar" },
+        { label: "Year Albums", path: "/events/albums" },
+      ],
+    },
     { label: "Contact", path: "/contact" },
     {
       label: "Alumni",
@@ -53,6 +55,33 @@ export default function NavBar() {
       ].filter(Boolean),
     },
   ];
+
+  // Helper to check which dropdown is open
+  const isDropdownOpen = (label) => {
+    if (label === "About") return aboutOpen;
+    if (label === "Events") return eventsOpen;
+    if (label === "Alumni") return alumniOpen;
+    return false;
+  };
+
+  const toggleDropdown = (label) => {
+    setAboutOpen(label === "About" ? (p) => !p : false);
+    setEventsOpen(label === "Events" ? (p) => !p : false);
+    setAlumniOpen(label === "Alumni" ? (p) => !p : false);
+  };
+
+  const toggleMobileDropdown = (label) => {
+    if (label === "About") setMobileAboutOpen((p) => !p);
+    if (label === "Events") setMobileEventsOpen((p) => !p);
+    if (label === "Alumni") setMobileAlumniOpen((p) => !p);
+  };
+
+  const isMobileDropdownOpen = (label) => {
+    if (label === "About") return mobileAboutOpen;
+    if (label === "Events") return mobileEventsOpen;
+    if (label === "Alumni") return mobileAlumniOpen;
+    return false;
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -69,6 +98,7 @@ export default function NavBar() {
     const handler = (e) => {
       if (navRef.current && !navRef.current.contains(e.target)) {
         setAboutOpen(false);
+        setEventsOpen(false);
         setAlumniOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -79,7 +109,6 @@ export default function NavBar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ✅ FIX: Uses context logout — clears state instantly
   const handleLogout = useCallback(() => {
     logout();
     setUserMenuOpen(false);
@@ -87,7 +116,12 @@ export default function NavBar() {
     navigate("/");
   }, [logout, navigate]);
 
-  const closeAll = useCallback(() => setIsOpen(false), []);
+  const closeAll = useCallback(() => {
+    setIsOpen(false);
+    setAboutOpen(false);
+    setEventsOpen(false);
+    setAlumniOpen(false);
+  }, []);
 
   return (
     <>
@@ -369,33 +403,22 @@ export default function NavBar() {
                 <div key={item.label} className="dropdown-wrap">
                   <button
                     className="nav-link"
-                    onClick={() => {
-                      if (item.label === "About") { setAboutOpen((p) => !p); setAlumniOpen(false); }
-                      else { setAlumniOpen((p) => !p); setAboutOpen(false); }
-                    }}
+                    onClick={() => toggleDropdown(item.label)}
                   >
                     {item.label}
                     <ChevronDown
                       size={13}
-                      className={`chevron-icon ${
-                        (item.label === "About" && aboutOpen) || (item.label === "Alumni" && alumniOpen)
-                          ? "chevron-open"
-                          : ""
-                      }`}
+                      className={`chevron-icon ${isDropdownOpen(item.label) ? "chevron-open" : ""}`}
                     />
                   </button>
-                  <div
-                    className={`dropdown-panel ${
-                      (item.label === "About" && aboutOpen) || (item.label === "Alumni" && alumniOpen) ? "open" : ""
-                    }`}
-                  >
+                  <div className={`dropdown-panel ${isDropdownOpen(item.label) ? "open" : ""}`}>
                     <div className="dropdown-gold-bar" />
                     <div style={{ padding: "6px 0" }}>
                       {item.submenu.map((sub) => (
                         <NavLink
                           key={sub.path}
                           to={sub.path}
-                          onClick={() => { setAboutOpen(false); setAlumniOpen(false); }}
+                          onClick={() => { setAboutOpen(false); setEventsOpen(false); setAlumniOpen(false); }}
                           className={({ isActive }) => `dropdown-item${isActive ? " active-dd" : ""}`}
                         >
                           {sub.label}
@@ -481,29 +504,17 @@ export default function NavBar() {
                 <div key={item.label}>
                   <button
                     className="m-link"
-                    onClick={() => {
-                      if (item.label === "About") setMobileAboutOpen((p) => !p);
-                      else setMobileAlumniOpen((p) => !p);
-                    }}
+                    onClick={() => toggleMobileDropdown(item.label)}
                   >
                     {item.label}
                     <ChevronDown
                       size={14}
-                      className={`chevron-icon ${
-                        (item.label === "About" && mobileAboutOpen) || (item.label === "Alumni" && mobileAlumniOpen)
-                          ? "chevron-open"
-                          : ""
-                      }`}
+                      className={`chevron-icon ${isMobileDropdownOpen(item.label) ? "chevron-open" : ""}`}
                     />
                   </button>
                   <div
                     className="m-sub"
-                    style={{
-                      maxHeight:
-                        (item.label === "About" && mobileAboutOpen) || (item.label === "Alumni" && mobileAlumniOpen)
-                          ? "300px"
-                          : "0",
-                    }}
+                    style={{ maxHeight: isMobileDropdownOpen(item.label) ? "300px" : "0" }}
                   >
                     {item.submenu.map((sub) => (
                       <NavLink key={sub.path} to={sub.path} onClick={closeAll} className="m-sub-link">
@@ -544,10 +555,7 @@ export default function NavBar() {
                   </NavLink>
                 )}
                 <div className="m-btn-row">
-                  <button
-                    onClick={() => { handleLogout(); closeAll(); }}
-                    className="m-btn-danger"
-                  >
+                  <button onClick={() => { handleLogout(); closeAll(); }} className="m-btn-danger">
                     <LogOut size={15} /> Sign Out
                   </button>
                 </div>

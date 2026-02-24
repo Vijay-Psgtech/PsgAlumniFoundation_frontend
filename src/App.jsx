@@ -16,6 +16,9 @@ import Patrons from "./pages/PatronsPage";
 import Contact from "./pages/ContactUsPage";
 import DonatePage from "./pages/DonatePage";
 import EventsPage from "./pages/EventsPage";
+import EventDetailPage from "./pages/EventDetailPage";
+import EventsCalendarPage from "./pages/EventsCalendarPage";
+import YearAlbumsPage from "./pages/YearAlbumsPage";
 
 import AlumniRegistration from "./pages/alumni/AlumniRegistration";
 import AlumniLogin from "./pages/alumni/AlumniLogin";
@@ -85,6 +88,9 @@ function AppRoutes() {
           <Route path="officebearers" element={<OfficeBearersPage />} />
           <Route path="contact" element={<Contact />} />
           <Route path="events" element={<EventsPage />} />
+          <Route path="/events/calendar" element={<EventsCalendarPage />} />
+          <Route path="/events/albums" element={<YearAlbumsPage />} />
+          <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="donate" element={<DonatePage />} />
 
           {/* ALUMNI AUTH */}

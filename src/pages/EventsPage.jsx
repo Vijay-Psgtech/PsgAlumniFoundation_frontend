@@ -1,703 +1,210 @@
-// frontend/src/pages/EventsPage.jsx
-// ✅ PREMIUM EVENTS PAGE
-// - Beautiful event listing
-// - Filter by status (upcoming/completed)
-// - Event cards with details
-// - Responsive grid layout
-// - Premium gold/navy/purple theme
+// frontend/src/pages/EventsPage.jsx — reads from DataContext (live sync with admin)
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, MapPin, Users, Search, ChevronRight, Sparkles, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useData, CATEGORY_COLORS } from "../context/dataConstants";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Calendar, MapPin, Clock, ArrowRight, Search, Filter } from "lucide-react";
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return {
+    day: date.getDate(),
+    month: date.toLocaleString("en-US", { month: "short" }),
+    year: date.getFullYear(),
+    dayName: date.toLocaleString("en-US", { weekday: "long" }),
+  };
+};
+
+const EventCard = ({ event, idx }) => {
+  const dateInfo = formatDate(event.date);
+  const catColor = CATEGORY_COLORS[event.category] || "#b8882a";
+  const isUpcoming = event.status === "upcoming";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: idx * 0.07 }}
+      style={{
+        background: "#ffffff",
+        border: event.highlight ? `1px solid ${catColor}55` : "1px solid rgba(15,27,53,0.09)",
+        borderRadius: "20px", overflow: "hidden", position: "relative",
+        boxShadow: "0 2px 16px rgba(15,27,53,0.06)",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      }}
+      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 40px rgba(15,27,53,0.12), 0 0 0 1px ${catColor}30`; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(15,27,53,0.06)"; }}
+    >
+      {event.highlight && (
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, ${catColor}, transparent)` }} />
+      )}
+
+      <div style={{ padding: "24px 24px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+          <span style={{ background: `${catColor}12`, color: catColor, border: `1px solid ${catColor}30`, borderRadius: "20px", padding: "4px 14px", fontSize: "11px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontFamily: "'DM Mono', monospace" }}>{event.category}</span>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            {event.highlight && <Star size={14} fill={catColor} color={catColor} />}
+            {!isUpcoming && <span style={{ color: "#9ca3af", fontSize: "11px", fontFamily: "'DM Mono', monospace" }}>COMPLETED</span>}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+          <div style={{
+            background: isUpcoming ? `${catColor}10` : "rgba(15,27,53,0.04)",
+            border: `1px solid ${isUpcoming ? catColor + "30" : "rgba(15,27,53,0.1)"}`,
+            borderRadius: "14px", padding: "12px 16px", textAlign: "center", minWidth: "64px", flexShrink: 0,
+          }}>
+            <div style={{ fontSize: "28px", fontWeight: "800", color: isUpcoming ? catColor : "#9ca3af", fontFamily: "'Playfair Display', serif", lineHeight: 1 }}>{dateInfo.day}</div>
+            <div style={{ fontSize: "11px", color: isUpcoming ? catColor : "#9ca3af", fontWeight: "600", letterSpacing: "1px", marginTop: "2px", fontFamily: "'DM Mono', monospace" }}>{dateInfo.month.toUpperCase()}</div>
+            <div style={{ fontSize: "10px", color: "#adb5bd", fontFamily: "'DM Mono', monospace" }}>{dateInfo.year}</div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#0f1b35", fontFamily: "'Playfair Display', serif", lineHeight: 1.3, marginBottom: "8px" }}>{event.title}</h3>
+            <p style={{ fontSize: "13px", color: "#6b7280", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{event.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "16px 24px 20px", marginTop: "16px", borderTop: "1px solid rgba(15,27,53,0.06)" }}>
+        <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#9ca3af", fontSize: "12px" }}><MapPin size={12} />{event.venue?.split(",")[0]}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#9ca3af", fontSize: "12px" }}><Users size={12} />{event.attendees} {isUpcoming ? "expected" : "attended"}</span>
+        </div>
+        <Link to={`/events/${event._id}`} style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: isUpcoming ? `${catColor}09` : "rgba(15,27,53,0.03)",
+          border: `1px solid ${isUpcoming ? catColor + "25" : "rgba(15,27,53,0.08)"}`,
+          borderRadius: "10px", padding: "10px 16px",
+          color: isUpcoming ? catColor : "#9ca3af",
+          fontSize: "13px", fontWeight: "600", textDecoration: "none", transition: "all 0.2s ease",
+        }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateX(3px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}
+        >
+          <span>{isUpcoming ? "View Details & Register" : "View Event Summary"}</span>
+          <ChevronRight size={14} />
+        </Link>
+      </div>
+    </motion.div>
+  );
+};
 
 const EventsPage = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { events } = useData(); // ✅ live from DataContext
   const [filter, setFilter] = useState("upcoming");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ✅ Sample events data (will be replaced with API call)
-  useEffect(() => {
-    const sampleEvents = [
-      {
-        _id: 1,
-        title: "PSG Tech Alumni Entrepreneur Award Ceremony",
-        date: "2026-02-15",
-        startDate: "2026-02-15",
-        endDate: "2026-02-15",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "An exclusive event to celebrate and award our most successful entrepreneur alumni.",
-        status: "upcoming",
-        duration: "1 day event",
-        attendees: 150,
-        image: null,
-      },
-      {
-        _id: 2,
-        title: "SITA AND VIRARAGHAVAN MEMORIAL LECTURE",
-        date: "2026-01-22",
-        startDate: "2026-01-22",
-        endDate: "2026-01-22",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "A memorial lecture honoring the legacy of Sita and Viraraghavan.",
-        status: "completed",
-        duration: "1 day event",
-        attendees: 200,
-        image: null,
-      },
-      {
-        _id: 3,
-        title: "MINI MARATHON by ALUMNI",
-        date: "2026-01-11",
-        startDate: "2026-01-11",
-        endDate: "2026-01-11",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "A fun and energetic mini marathon organized by our alumni community.",
-        status: "completed",
-        duration: "1 day event",
-        attendees: 300,
-        image: null,
-      },
-      {
-        _id: 4,
-        title: "39th GRD Death Anniversary",
-        date: "2026-01-10",
-        startDate: "2026-01-10",
-        endDate: "2026-01-10",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "Remembrance event honoring the 39th death anniversary.",
-        status: "completed",
-        duration: "1 day event",
-        attendees: 250,
-        image: null,
-      },
-      {
-        _id: 5,
-        title: "ALUMNI CONGRESS",
-        date: "2026-01-10",
-        startDate: "2026-01-10",
-        endDate: "2026-01-10",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "Annual congregation of all alumni members to discuss and celebrate achievements.",
-        status: "completed",
-        duration: "1 day event",
-        attendees: 400,
-        image: null,
-      },
-      {
-        _id: 6,
-        title: "Career Development Workshop",
-        date: "2026-03-01",
-        startDate: "2026-03-01",
-        endDate: "2026-03-01",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "Workshop on career advancement and professional development.",
-        status: "upcoming",
-        duration: "1 day event",
-        attendees: 100,
-        image: null,
-      },
-      {
-        _id: 7,
-        title: "Networking Breakfast",
-        date: "2026-02-28",
-        startDate: "2026-02-28",
-        endDate: "2026-02-28",
-        venue: "PSG College of Technology, Avinashi Road, Coimbatore",
-        description: "Casual networking event for alumni to connect and share experiences.",
-        status: "upcoming",
-        duration: "1 day event",
-        attendees: 80,
-        image: null,
-      },
-    ];
-
-    setTimeout(() => {
-      setEvents(sampleEvents);
-      setLoading(false);
-    }, 500);
-  }, []);
-
-  // ✅ Filter and search events
-  const filteredEvents = events.filter((event) => {
-    const matchesFilter = event.status === filter;
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.venue.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
+  const filteredEvents = events.filter(e => {
+    const matchFilter = e.status === filter;
+    const matchSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.category.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchFilter && matchSearch;
   });
 
-  // ✅ Separate upcoming and completed events
-  const upcomingEvents = filteredEvents.filter((e) => e.status === "upcoming");
-  const completedEvents = filteredEvents.filter((e) => e.status === "completed");
-
-  // ✅ Format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const year = date.getFullYear();
-    const dayName = date.toLocaleString("en-US", { weekday: "long" });
-    return { day, month, year, dayName };
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
-  };
+  const upcoming = events.filter(e => e.status === "upcoming").length;
+  const completed = events.filter(e => e.status === "completed").length;
 
   return (
-    <>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #faf7f2 0%, #f3ede3 50%, #faf7f2 100%)", fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=Outfit:wght@300;400;500;600&display=swap');
-
-        .events-section {
-          background: linear-gradient(165deg, #f8f5ee 0%, #fdfcf9 45%, #f2f4fa 100%);
-          min-height: 100vh;
-          padding: 60px 24px;
-          font-family: 'Outfit', sans-serif;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .events-section::before {
-          content: '';
-          position: absolute;
-          top: -200px;
-          right: -200px;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(201, 168, 76, 0.08) 0%, transparent 70%);
-          pointer-events: none;
-        }
-
-        .events-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          position: relative;
-          z-index: 2;
-        }
-
-        .events-header {
-          text-align: center;
-          margin-bottom: 60px;
-        }
-
-        .events-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 52px;
-          font-weight: 800;
-          color: #0c0e1a;
-          margin-bottom: 16px;
-          letter-spacing: -0.025em;
-        }
-
-        .events-subtitle {
-          font-size: 16px;
-          color: #666e80;
-          font-weight: 300;
-        }
-
-        .events-controls {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 48px;
-          flex-wrap: wrap;
-        }
-
-        .search-wrapper {
-          flex: 1;
-          min-width: 250px;
-          position: relative;
-        }
-
-        .search-input {
-          width: 100%;
-          padding: 12px 16px 12px 40px;
-          border: 1px solid #e0e6f0;
-          border-radius: 8px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 14px;
-          transition: all 0.3s;
-          background: white;
-        }
-
-        .search-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-icon {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #a0aec0;
-          pointer-events: none;
-        }
-
-        .filter-buttons {
-          display: flex;
-          gap: 12px;
-        }
-
-        .filter-btn {
-          padding: 11px 24px;
-          border: 1px solid #e0e6f0;
-          background: white;
-          border-radius: 8px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: #a0aec0;
-        }
-
-        .filter-btn.active {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border-color: #667eea;
-        }
-
-        .filter-btn:hover:not(.active) {
-          background: #f0f3f9;
-          color: #667eea;
-          border-color: #667eea;
-        }
-
-        .events-section-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 24px;
-          font-weight: 700;
-          color: #0c0e1a;
-          margin-bottom: 24px;
-          margin-top: 40px;
-          padding-bottom: 16px;
-          border-bottom: 2px solid #e0e6f0;
-        }
-
-        .events-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
-          gap: 24px;
-          margin-bottom: 40px;
-        }
-
-        .event-card {
-          background: white;
-          border: 1px solid #e0e6f0;
-          border-radius: 12px;
-          overflow: hidden;
-          transition: all 0.3s;
-          cursor: pointer;
-          display: flex;
-          height: 100%;
-        }
-
-        .event-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-          border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .event-date-box {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-width: 120px;
-          text-align: center;
-          font-weight: 700;
-        }
-
-        .event-date-box.completed {
-          background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
-        }
-
-        .event-day {
-          font-size: 32px;
-          font-weight: 800;
-          line-height: 1;
-          margin-bottom: 4px;
-        }
-
-        .event-month-year {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          opacity: 0.9;
-        }
-
-        .event-content {
-          padding: 24px;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .event-status {
-          display: inline-block;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          padding: 4px 8px;
-          border-radius: 4px;
-          margin-bottom: 12px;
-          width: fit-content;
-        }
-
-        .event-status.upcoming {
-          background: #e0f2fe;
-          color: #0369a1;
-        }
-
-        .event-status.completed {
-          background: #f0fdf4;
-          color: #166534;
-        }
-
-        .event-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #0c0e1a;
-          margin-bottom: 12px;
-          line-height: 1.4;
-        }
-
-        .event-venue {
-          display: flex;
-          align-items: flex-start;
-          gap: 8px;
-          font-size: 13px;
-          color: #666e80;
-          margin-bottom: 12px;
-          line-height: 1.4;
-        }
-
-        .event-venue svg {
-          color: #667eea;
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        .event-duration {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          color: #666e80;
-          margin-bottom: 16px;
-        }
-
-        .event-duration svg {
-          color: #667eea;
-        }
-
-        .event-attendees {
-          font-size: 12px;
-          color: #a0aec0;
-          margin-top: auto;
-          padding-top: 12px;
-          border-top: 1px solid #e0e6f0;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 60px 20px;
-          color: #a0aec0;
-        }
-
-        .empty-state-icon {
-          font-size: 64px;
-          margin-bottom: 16px;
-        }
-
-        .empty-state-title {
-          font-size: 18px;
-          font-weight: 600;
-          color: #0c0e1a;
-          margin-bottom: 8px;
-        }
-
-        .empty-state-text {
-          font-size: 14px;
-          color: #a0aec0;
-        }
-
-        @media (max-width: 900px) {
-          .events-grid {
-            grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-          }
-
-          .events-title {
-            font-size: 36px;
-          }
-
-          .events-controls {
-            flex-direction: column;
-          }
-
-          .search-wrapper {
-            min-width: auto;
-          }
-
-          .filter-buttons {
-            width: 100%;
-            justify-content: center;
-          }
-        }
-
-        @media (max-width: 600px) {
-          .events-section {
-            padding: 40px 16px;
-          }
-
-          .events-title {
-            font-size: 28px;
-          }
-
-          .event-card {
-            flex-direction: column;
-          }
-
-          .event-date-box {
-            min-width: auto;
-            padding: 16px;
-          }
-
-          .event-date-box .event-day {
-            font-size: 24px;
-          }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800;900&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px; }
+        @media (max-width: 640px) { .events-grid { grid-template-columns: 1fr; } }
       `}</style>
 
-      <motion.div
-        className="events-section"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="events-container">
-          {/* Header */}
-          <motion.div
-            className="events-header"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <h1 className="events-title">Events</h1>
-            <p className="events-subtitle">
-              Explore upcoming events and past celebrations from our alumni community
-            </p>
-          </motion.div>
+      {/* Hero */}
+      <div style={{ position: "relative", padding: "100px 40px 60px", textAlign: "center", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "-60px", left: "50%", transform: "translateX(-50%)", width: "600px", height: "300px", background: "radial-gradient(ellipse, rgba(184,136,42,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: "30px", right: "10%", width: "180px", height: "180px", background: "radial-gradient(circle, rgba(109,79,194,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-          {/* Search & Filter */}
-          <motion.div
-            className="events-controls"
-            variants={itemVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="search-wrapper">
-              <Search className="search-icon" size={18} />
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search events by name or venue..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="filter-buttons">
-              <button
-                className={`filter-btn ${filter === "upcoming" ? "active" : ""}`}
-                onClick={() => setFilter("upcoming")}
-              >
-                Upcoming
-              </button>
-              <button
-                className={`filter-btn ${filter === "completed" ? "active" : ""}`}
-                onClick={() => setFilter("completed")}
-              >
-                Completed
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Upcoming Events */}
-          {filter === "upcoming" && (
-            <motion.div
-              key="upcoming"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              {upcomingEvents.length > 0 && (
-                <h2 className="events-section-title">
-                  Upcoming Events ({upcomingEvents.length})
-                </h2>
-              )}
-              <div className="events-grid">
-                {upcomingEvents.map((event, idx) => {
-                  const dateInfo = formatDate(event.date);
-                  return (
-                    <motion.div
-                      key={event._id}
-                      className="event-card"
-                      variants={itemVariants}
-                      initial="hidden"
-                      animate="visible"
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <div className="event-date-box">
-                        <div className="event-day">{dateInfo.day}</div>
-                        <div className="event-month-year">
-                          {dateInfo.month} {dateInfo.year}
-                        </div>
-                      </div>
-
-                      <div className="event-content">
-                        <span className="event-status upcoming">
-                          {dateInfo.dayName.substring(0, 3).toUpperCase()}
-                        </span>
-
-                        <h3 className="event-title">{event.title}</h3>
-
-                        <div className="event-venue">
-                          <MapPin size={16} />
-                          <span>{event.venue}</span>
-                        </div>
-
-                        <div className="event-duration">
-                          <Clock size={16} />
-                          <span>{event.duration}</span>
-                        </div>
-
-                        <div className="event-attendees">
-                          👥 {event.attendees} expected attendees
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(184,136,42,0.1)", border: "1px solid rgba(184,136,42,0.25)", borderRadius: "30px", padding: "6px 18px", marginBottom: "24px" }}>
+            <Sparkles size={14} color="#b8882a" />
+            <span style={{ color: "#b8882a", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", fontFamily: "'DM Mono', monospace" }}>ALUMNI EVENTS</span>
+          </div>
+          <h1 style={{ fontSize: "clamp(36px, 6vw, 64px)", fontWeight: "900", color: "#0f1b35", fontFamily: "'Playfair Display', serif", lineHeight: 1.1, marginBottom: "20px" }}>
+            Where Alumni<br />
+            <span style={{ background: "linear-gradient(135deg, #b8882a, #9a7020, #6d4fc2)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Come Together</span>
+          </h1>
+          <p style={{ color: "#6b7280", fontSize: "18px", maxWidth: "520px", margin: "0 auto 40px", lineHeight: 1.6 }}>
+            Discover upcoming events, relive memories from past gatherings, and stay connected with your alma mater.
+          </p>
+          <div style={{ display: "inline-flex", gap: "0", background: "#ffffff", border: "1px solid rgba(15,27,53,0.1)", borderRadius: "16px", overflow: "hidden", boxShadow: "0 4px 20px rgba(15,27,53,0.07)" }}>
+            {[{ label: "Upcoming", value: upcoming, color: "#b8882a" }, { label: "Completed", value: completed, color: "#6d4fc2" }, { label: "Total Alumni", value: "15K+", color: "#1a7a54" }].map((stat, i) => (
+              <div key={i} style={{ padding: "16px 28px", borderRight: i < 2 ? "1px solid rgba(15,27,53,0.08)" : "none" }}>
+                <div style={{ fontSize: "26px", fontWeight: "800", color: stat.color, fontFamily: "'Playfair Display', serif" }}>{stat.value}</div>
+                <div style={{ fontSize: "12px", color: "#9ca3af", fontFamily: "'DM Mono', monospace", letterSpacing: "1px" }}>{stat.label.toUpperCase()}</div>
               </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
-              {upcomingEvents.length === 0 && (
-                <motion.div
-                  className="empty-state"
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <div className="empty-state-icon">📅</div>
-                  <div className="empty-state-title">No upcoming events</div>
-                  <div className="empty-state-text">
-                    Check back soon for new events!
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+        {/* Search + Filter */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ display: "flex", gap: "16px", marginBottom: "40px", flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ flex: 1, minWidth: "260px", position: "relative" }}>
+            <Search size={16} color="#9ca3af" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)" }} />
+            <input type="text" placeholder="Search events, categories..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: "100%", background: "#ffffff", border: "1px solid rgba(15,27,53,0.1)", borderRadius: "12px", padding: "13px 16px 13px 44px", color: "#0f1b35", fontSize: "14px", outline: "none", fontFamily: "'Inter', sans-serif", boxShadow: "0 2px 8px rgba(15,27,53,0.04)" }}
+              onFocus={e => e.target.style.borderColor = "rgba(184,136,42,0.5)"}
+              onBlur={e => e.target.style.borderColor = "rgba(15,27,53,0.1)"}
+            />
+          </div>
+          <div style={{ display: "flex", background: "#ffffff", border: "1px solid rgba(15,27,53,0.1)", borderRadius: "12px", padding: "4px", boxShadow: "0 2px 8px rgba(15,27,53,0.04)" }}>
+            {["upcoming", "completed"].map(f => (
+              <button key={f} onClick={() => setFilter(f)} style={{
+                padding: "9px 22px", borderRadius: "9px", border: "none", cursor: "pointer",
+                fontSize: "13px", fontWeight: "600", fontFamily: "'Inter', sans-serif", transition: "all 0.2s ease",
+                background: filter === f ? (f === "upcoming" ? "linear-gradient(135deg, #b8882a, #9a7020)" : "linear-gradient(135deg, #6d4fc2, #4050b5)") : "transparent",
+                color: filter === f ? "#fff" : "#9ca3af",
+              }}>{f === "upcoming" ? "Upcoming" : "Completed"}</button>
+            ))}
+          </div>
+          <Link to="/events/calendar" style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            background: "#ffffff", border: "1px solid rgba(15,27,53,0.1)",
+            borderRadius: "12px", padding: "12px 20px", color: "#6b7280",
+            fontSize: "13px", fontWeight: "600", textDecoration: "none",
+            boxShadow: "0 2px 8px rgba(15,27,53,0.04)", transition: "all 0.2s ease",
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(109,79,194,0.4)"; e.currentTarget.style.color = "#6d4fc2"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(15,27,53,0.1)"; e.currentTarget.style.color = "#6b7280"; }}
+          >
+            <Calendar size={14} />Calendar View
+          </Link>
+        </motion.div>
 
-          {/* Completed Events */}
-          {filter === "completed" && (
-            <motion.div
-              key="completed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              {completedEvents.length > 0 && (
-                <h2 className="events-section-title">
-                  Completed Events ({completedEvents.length})
-                </h2>
-              )}
-              <div className="events-grid">
-                {completedEvents.map((event, idx) => {
-                  const dateInfo = formatDate(event.date);
-                  return (
-                    <motion.div
-                      key={event._id}
-                      className="event-card"
-                      variants={itemVariants}
-                      initial="hidden"
-                      animate="visible"
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <div className="event-date-box completed">
-                        <div className="event-day">{dateInfo.day}</div>
-                        <div className="event-month-year">
-                          {dateInfo.month} {dateInfo.year}
-                        </div>
-                      </div>
-
-                      <div className="event-content">
-                        <span className="event-status completed">
-                          {dateInfo.dayName.substring(0, 3).toUpperCase()}
-                        </span>
-
-                        <h3 className="event-title">{event.title}</h3>
-
-                        <div className="event-venue">
-                          <MapPin size={16} />
-                          <span>{event.venue}</span>
-                        </div>
-
-                        <div className="event-duration">
-                          <Clock size={16} />
-                          <span>{event.duration}</span>
-                        </div>
-
-                        <div className="event-attendees">
-                          👥 {event.attendees} attendees
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {completedEvents.length === 0 && (
-                <motion.div
-                  className="empty-state"
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <div className="empty-state-icon">✓</div>
-                  <div className="empty-state-title">No completed events</div>
-                  <div className="empty-state-text">
-                    Past events will appear here
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+        {/* Section label */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
+          <div style={{ width: "3px", height: "24px", background: filter === "upcoming" ? "linear-gradient(#b8882a,#9a7020)" : "linear-gradient(#6d4fc2,#4050b5)", borderRadius: "2px" }} />
+          <span style={{ color: "#0f1b35", fontWeight: "700", fontSize: "18px", fontFamily: "'Playfair Display', serif" }}>
+            {filter === "upcoming" ? "Upcoming Events" : "Completed Events"}
+          </span>
+          <span style={{ color: "#9ca3af", fontSize: "14px", fontFamily: "'DM Mono', monospace" }}>({filteredEvents.length})</span>
         </div>
-      </motion.div>
-    </>
+
+        <AnimatePresence mode="wait">
+          {filteredEvents.length > 0 ? (
+            <div className="events-grid">
+              {filteredEvents.map((event, idx) => <EventCard key={event._id} event={event} idx={idx} />)}
+            </div>
+          ) : (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{
+              textAlign: "center", padding: "80px 20px",
+              background: "#ffffff", border: "1px solid rgba(15,27,53,0.08)", borderRadius: "20px",
+              boxShadow: "0 2px 16px rgba(15,27,53,0.05)",
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>{filter === "upcoming" ? "📅" : "✓"}</div>
+              <h3 style={{ color: "#0f1b35", fontSize: "20px", fontFamily: "'Playfair Display', serif", marginBottom: "8px" }}>No events found</h3>
+              <p style={{ color: "#9ca3af" }}>Try adjusting your search or check back later.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 
