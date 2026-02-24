@@ -81,26 +81,28 @@ export const alumniAPI = {
 
 // ── ADMIN ────────────────────────────────────────────────────────
 export const adminAPI = {
-  getDashboardStats:    ()           => api.get("/admin/dashboard/stats"),
-  getAllAlumniForAdmin: (params)      => api.get("/admin/dashboard/alumni/all", { params }),
-  getPendingAlumni:    ()            => api.get("/admin/pending"),
-  getApprovedAlumni:   ()            => api.get("/admin/approved"),
-  getAlumniDetail:     (id)          => api.get(`/admin/dashboard/alumni/${id}`),
-  approveAlumni:       (id)          => api.put(`/admin/approve/${id}`),
-  rejectAlumni:        (id)          => api.put(`/admin/reject/${id}`),
-  makeAlumniAdmin:     (id)          => api.put(`/admin/make-admin/${id}`),
-  getAllDonations:      (params)      => api.get("/admin/dashboard/donations", { params }),
-  getDonationDetail:   (id)          => api.get(`/admin/dashboard/donations/${id}`),
-  updateDonationStatus:(id, status)  => api.put(`/admin/dashboard/donations/${id}/status`, { status }),
+  // Dashboard stats
+  getStats: () => api.get("/admin/dashboard/stats"),
+  getAllAlumni: () => api.get("/admin/dashboard/alumni/all"),
+  
+  // Alumni approval & management
+  getPendingAlumni: () => api.get("/admin/pending"),
+  approveAlumni: (id) => api.put(`/admin/approve/${id}`),
+  rejectAlumni: (id) => api.put(`/admin/reject/${id}`),
+  makeAlumniAdmin: (id) => api.put(`/admin/make-admin/${id}`),
 };
 
 // ── DONATIONS ────────────────────────────────────────────────────
 export const donationAPI = {
-  createDonation:        (data) => api.post("/donations", data),
-  verifyRazorpayPayment: (data) => api.post("/donations/verify-razorpay", data),
-  verifyStripePayment:   (data) => api.post("/donations/verify-stripe", data),
-  getMyDonations:        ()     => api.get("/donations/mine"),
-  getAllDonations:        ()     => api.get("/donations/admin/all"),
+  getAll: () => api.get("/donations"),
+  getMine: () => api.get("/donations/mine"),
+  create: (data) => api.post("/donations", data),
+};
+
+export const donationsAPI = {
+  getAll: () => api.get("/donations"),
+  getMine: () => api.get("/donations/mine"),
+  create: (data) => api.post("/donations", data),
 };
 
 // ── CONTACT ──────────────────────────────────────────────────────
@@ -108,6 +110,27 @@ export const contactAPI = {
   sendContactForm:     (data)  => api.post("/contact", data),
   subscribeNewsletter: (email) => api.post("/contact/subscribe", { email }),
 };
+
+// ── EVENTS API ──────────────────────────────────────────────────────────────
+// ✅ For Events Page, Calendar, Detail Page
+export const eventsAPI = {
+  getAll: () => api.get("/events"),
+  getById: (id) => api.get(`/events/${id}`),
+  create: (data) => api.post("/events", data),
+  update: (id, data) => api.put(`/events/${id}`, data),
+  delete: (id) => api.delete(`/events/${id}`),
+};
+
+// ── ALBUMS API ──────────────────────────────────────────────────────────────
+// ✅ For Year Albums Page
+export const albumsAPI = {
+  getAll: () => api.get("/albums"),
+  getByYear: (year) => api.get(`/albums/year/${year}`),
+  create: (data) => api.post("/albums", data),
+  update: (id, data) => api.put(`/albums/${id}`, data),
+  delete: (id) => api.delete(`/albums/${id}`),
+};
+
 
 // ── UTILS (read-only helpers) ─────────────────────────────────────
 export const isAuthenticated = () => !!localStorage.getItem("token");
