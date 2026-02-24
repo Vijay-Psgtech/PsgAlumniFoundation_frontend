@@ -30,6 +30,7 @@ const AlumniRegistration = () => {
     jobTitle: "",
     country: "",
     city: "",
+    fullAddress: "",
     coordinates: [],
     linkedin: "",
   });
@@ -63,6 +64,7 @@ const AlumniRegistration = () => {
       ...prev,
       city: city || place.display_name,
       country: country || place.display_name.split(",").slice(-1)[0].trim(),
+      fullAddress: place.display_name,
       coordinates: [lon, lat],
     }));
     setLocationQuery(place.display_name);
@@ -129,6 +131,7 @@ const AlumniRegistration = () => {
           jobTitle: formData.jobTitle.trim(),
           country: formData.country.trim(),
           city: formData.city.trim(),
+          fullAddress: formData.fullAddress.trim(),
           coordinates: formData.coordinates,
           linkedin: formData.linkedin.trim(),
         };

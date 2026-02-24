@@ -233,7 +233,7 @@ const AlumniMap = () => {
                 <div className="info-item">
                   <span className="info-label">📍 Location</span>
                   <span className="location-badge">
-                    📍 {selectedAlumni.city}, {selectedAlumni.country}
+                    📍 {selectedAlumni.fullAddress || `${selectedAlumni.city}, ${selectedAlumni.country}`}
                   </span>
                 </div>
 
