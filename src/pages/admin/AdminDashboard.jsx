@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalAlumni: 0,
     pendingAlumni: 0,
-    totalDonations: 0,
+    totalDonatedAmount: 0,
     completedDonations: 0,
   });
 
@@ -345,6 +345,9 @@ const AdminDashboard = () => {
         }
 
         .list-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          gap: 16px;
           background: white;
           border: 1px solid #e0e6f0;
           border-radius: 12px;
@@ -353,7 +356,9 @@ const AdminDashboard = () => {
         }
 
         .list-item-premium {
-          display: flex;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 16px;
           align-items: center;
           padding: 20px;
           border-bottom: 1px solid #e2e8f0;
@@ -678,7 +683,7 @@ const AdminDashboard = () => {
 
             <motion.div className="stat-card" variants={itemVariants}>
               <div className="stat-icon">💰</div>
-              <div className="stat-value">{stats.totalDonations}</div>
+              <div className="stat-value">{stats.totalDonatedAmount}</div>
               <div className="stat-label">Total Donations</div>
             </motion.div>
 
