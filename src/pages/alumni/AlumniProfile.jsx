@@ -85,7 +85,7 @@ const AlumniProfile = () => {
       ...prev,
       city: city || place.display_name,
       country: country || place.display_name.split(",").slice(-1)[0].trim(),
-      location: place.display_name,
+      fullAddress: place.display_name,
       coordinates: [lon, lat],
     }));
     setLocationQuery(place.display_name);
@@ -684,7 +684,7 @@ const AlumniProfile = () => {
                   <div className="info-row">
                     <span className="info-label">Location</span>
                     <span className="info-value">
-                      {profileData.location || <span className="info-empty">Not provided</span>}
+                      {profileData.fullAddress || profileData.location || <span className="info-empty">Not provided</span>}
                     </span>
                   </div>
                 </div>
