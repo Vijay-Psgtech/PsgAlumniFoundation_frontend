@@ -136,9 +136,10 @@ const AlumniRegistration = () => {
           linkedin: formData.linkedin.trim(),
         };
         const response = await authAPI.register(payload);
-        // ✅ FIX: use context login() — NOT localStorage directly
-        if (response.data.token) {
-          login(response.data.alumni, response.data.token);
+        // Server sets HttpOnly cookie automatically — no token in response body
+        const alumni = response.data.alumni;
+        if (alumni) {
+          await login(alumni); // seed AuthContext state; cookie already set by server
         }
         setRegistered(true);
       } catch (err) {

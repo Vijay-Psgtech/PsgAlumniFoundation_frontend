@@ -127,6 +127,7 @@ import About from "./About";
 import Vision from "./Vision";
 import Values from "./Values";
 import Mission from "./Mission";
+import { useAuth } from "../context/AuthContext";
 
 const features = [
   {emoji:"👥",title:"Alumni Directory",desc:"Browse and connect with global alumni"},
@@ -136,8 +137,8 @@ const features = [
 ];
 
 const HomePage = () => {
-  let user = null;
-  try { user = JSON.parse(localStorage.getItem("alumniUser")); } catch {}
+  const { user } = useAuth();
+  
 
   return (
     <>

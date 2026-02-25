@@ -50,19 +50,25 @@ const AlumniLogin = () => {
       try {
         const response = await authAPI.login({ email, password });
 
-        if (response.data.token) {
-          // ✅ FIX 2: Use context login() — updates NavBar state instantly
-          login(response.data.alumni, response.data.token);
+        // Server sets HttpOnly cookie automatically — no token in response body
+        const alumni = response.data.alumni;
 
-          // ✅ FIX 3: Role-based redirect
-          if (response.data.alumni?.isAdmin) {
-            navigate("/alumni/dashboard");
-          } else if (response.data.alumni?.isApproved) {
-            navigate("/alumni/profile");
-          } else {
-            // Registered but pending admin approval
-            navigate("/alumni/register");
-          }
+        if (!alumni) {
+          setErrors({ general: "Login failed: no user data received" });
+          return;
+        }
+
+        // Seed AuthContext state; cookie is already set by the server
+        await login(alumni);
+
+        // Role-based redirect
+        if (alumni.isAdmin) {
+          navigate("/alumni/dashboard");
+        } else if (alumni.isApproved) {
+          navigate("/alumni/profile");
+        } else {
+          // Registered but pending admin approval
+          navigate("/alumni/register");
         }
       } catch (err) {
         const errorMessage = err.response?.data?.message || "Invalid email or password";

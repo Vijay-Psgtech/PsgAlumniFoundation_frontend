@@ -9,20 +9,8 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
+  withCredentials: true, // send HttpOnly cookie on every request
 });
-
-// REQUEST INTERCEPTOR — attach JWT token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => {
-    console.error("❌ Request error:", error.message);
-    return Promise.reject(error);
-  }
-);
 
 // RESPONSE INTERCEPTOR — handle 401/403 globally
 api.interceptors.response.use(
@@ -35,8 +23,8 @@ api.interceptors.response.use(
     console.error("❌ API Error:", { status, url, message });
 
     if (status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("alumniUser");
+      // Cookie is already expired/invalid on the server side.
+      // Dispatch event so AuthContext / protected routes can react.
       window.dispatchEvent(new CustomEvent("auth:logout", { detail: { url } }));
     }
 
@@ -66,7 +54,7 @@ export const adminAuthAPI = {
   login: (data) => api.post("/admin/auth/login", data),
   register: (data) => api.post("/admin/auth/register", data),
   getProfile: () => api.get("/admin/auth/profile"),
-  logout: () => { localStorage.removeItem("token"); localStorage.removeItem("alumniUser"); },
+  logout: () => api.post("/admin/auth/logout"),
 };
 
 
@@ -131,18 +119,5 @@ export const albumsAPI = {
   delete: (id) => api.delete(`/albums/${id}`),
 };
 
-
-// ── UTILS (read-only helpers) ─────────────────────────────────────
-export const isAuthenticated = () => !!localStorage.getItem("token");
-
-export const isAdmin = () => {
-  try { return JSON.parse(localStorage.getItem("alumniUser"))?.isAdmin === true; }
-  catch { return false; }
-};
-
-export const getCurrentUser = () => {
-  try { return JSON.parse(localStorage.getItem("alumniUser")); }
-  catch { return null; }
-};
 
 export default api;

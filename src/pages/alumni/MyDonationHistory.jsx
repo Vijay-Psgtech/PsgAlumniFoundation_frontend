@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { donationAPI } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 import "./alumni.css";
 
 const MyDonationHistory = () => {
@@ -15,14 +16,7 @@ const MyDonationHistory = () => {
   const [error, setError] = useState("");
   const [stats, setStats] = useState({ total: 0, count: 0 });
 
-  // ── Get current alumni user from localStorage ──
-  const alumniUser = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("alumniUser"));
-    } catch {
-      return null;
-    }
-  })();
+  const { user: alumniUser } = useAuth();
 
   // ── Load donations from real API ──
   useEffect(() => {
@@ -63,9 +57,9 @@ const MyDonationHistory = () => {
   const getStatusBadge = (status) => {
     const config = {
       completed: { background: "#dcfce7", color: "#166534", label: "✓ Completed" },
-      pending:   { background: "#fef9c3", color: "#854d0e", label: "⏳ Pending"   },
-      failed:    { background: "#fee2e2", color: "#991b1b", label: "✕ Failed"    },
-      refunded:  { background: "#e0f2fe", color: "#075985", label: "↩ Refunded"  },
+      pending: { background: "#fef9c3", color: "#854d0e", label: "⏳ Pending" },
+      failed: { background: "#fee2e2", color: "#991b1b", label: "✕ Failed" },
+      refunded: { background: "#e0f2fe", color: "#075985", label: "↩ Refunded" },
     };
     const s = config[status] || config.pending;
     return (
