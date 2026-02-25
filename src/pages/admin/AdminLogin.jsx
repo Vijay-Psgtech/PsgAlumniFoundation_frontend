@@ -13,29 +13,19 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login: authLogin } = useAuth();
+  const { user, login: authLogin } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
   };
 
-  // ✅ Redirect if already logged in as admin
+  // ✅ Redirect if already logged in as admin (cookie-based session)
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const alumniUser = localStorage.getItem("alumniUser");
-
-    if (token && alumniUser) {
-      try {
-        const user = JSON.parse(alumniUser);
-        if (user.isAdmin) {
-          navigate("/admin/dashboard");
-        }
-      } catch (e) {
-        console.error("Error parsing user:", e);
-      }
+    if (user?.isAdmin) {
+      navigate("/admin/dashboard");
     }
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,31 +43,30 @@ const AdminLogin = () => {
 
       const response = await authAPI.login({ email, password });
 
-      if (response.data.token) {
-        const token = response.data.token;
-        const alumni = response.data.alumni;
+      // Server sets HttpOnly cookie automatically — no token in response body
+      const alumni = response.data.alumni;
 
-        if (!alumni.isAdmin) {
-          setError("You do not have admin privileges");
-          setLoading(false);
-          return;
-        }
-
-        if (!alumni.isApproved) {
-          setError("Your account is not approved yet");
-          setLoading(false);
-          return;
-        }
-
-        localStorage.setItem("token", token);
-        localStorage.setItem("alumniUser", JSON.stringify(alumni));
-
-        console.log("✅ Admin login successful");
-        authLogin(alumni, token);
-        navigate("/admin/dashboard");
-      } else {
-        setError("Login failed: No token received");
+      if (!alumni) {
+        setError("Login failed: No user data received");
+        setLoading(false);
+        return;
       }
+
+      if (!alumni.isAdmin) {
+        setError("You do not have admin privileges");
+        setLoading(false);
+        return;
+      }
+
+      if (!alumni.isApproved) {
+        setError("Your account is not approved yet");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Admin login successful");
+      await authLogin(alumni); // seed AuthContext state; cookie already set by server
+      navigate("/admin/dashboard");
     } catch (err) {
       console.error("❌ Login error:", err);
 

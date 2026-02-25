@@ -1,8 +1,8 @@
 // src/context/AuthContext.jsx
-// ✅ FIXED: Fetches fresh user data from server on mount.
-// This solves the core bug: alumni logs in → admin approves them → 
-// alumniUser in localStorage still has isApproved:false → ProtectedRoute blocks them.
-// Now on every page load, we re-fetch /auth/profile to get the latest approval status.
+// ✅ HttpOnly cookie auth — token lives in cookie, never in localStorage.
+// On mount: hit /auth/profile with credentials:"include" to verify cookie.
+// login() receives fresh user data from the server response body.
+// logout() calls POST /api/auth/logout so the server clears the cookie.
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
@@ -11,25 +11,14 @@ const AuthContext = createContext(null);
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    // Seed from localStorage so there's no flash on reload
-    try { return JSON.parse(localStorage.getItem("alumniUser")); }
-    catch { return null; }
-  });
+  // No localStorage seed — we verify with the server on every mount
+  const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  // ── On mount: verify token + refresh user from server ──────────
+  // ── On mount: verify cookie + refresh user from server ──────────
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setUser(null);
-      setAuthLoading(false);
-      return;
-    }
-
     fetch(`${API_BASE}/auth/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include", // sends the HttpOnly cookie automatically
     })
       .then((res) => {
         if (!res.ok) throw new Error("Unauthorized");
@@ -38,63 +27,63 @@ export function AuthProvider({ children }) {
       .then((data) => {
         const freshUser = data?.alumni ?? data?.user ?? data ?? null;
         if (freshUser) {
-          localStorage.setItem("alumniUser", JSON.stringify(freshUser));
           setUser(freshUser);
         } else {
           throw new Error("No user in response");
         }
       })
       .catch(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("alumniUser");
         setUser(null);
       })
       .finally(() => setAuthLoading(false));
   }, []);
 
-  const login = useCallback(async(userData, token) => {
-    localStorage.setItem("alumniUser", JSON.stringify(userData));
-    localStorage.setItem("token", token);
+  // ── login: called after a successful /auth/login response ───────
+  // The server has already set the cookie; we just store user data in state.
+  const login = useCallback(async (userData) => {
     setUser(userData);
+    // Optionally re-fetch to get the absolute latest profile
     try {
-    const res = await fetch(`${API_BASE}/auth/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const freshUser = data?.alumni ?? data?.user ?? data ?? null;
-      if (freshUser) {
-        localStorage.setItem("alumniUser", JSON.stringify(freshUser));
-        setUser(freshUser);
+      const res = await fetch(`${API_BASE}/auth/profile`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const freshUser = data?.alumni ?? data?.user ?? data ?? null;
+        if (freshUser) setUser(freshUser);
       }
+    } catch (err) {
+      console.error("Failed to refresh user after login", err);
     }
-  } catch (err) {
-    console.error("Failed to refresh user after login", err);
-  }
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("alumniUser");
+  // ── logout: ask server to clear the cookie ───────────────────────
+  const logout = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout request failed", err);
+    }
     setUser(null);
   }, []);
 
+  // ── refreshUser: re-fetch profile from server ───────────────────
   const refreshUser = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     try {
       const res = await fetch(`${API_BASE}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json();
       const freshUser = data?.alumni ?? data?.user ?? data ?? null;
       if (freshUser) {
-        localStorage.setItem("alumniUser", JSON.stringify(freshUser));
         setUser(freshUser);
       }
     } catch {
-      logout();
+      await logout();
     }
   }, [logout]);
 

@@ -11,7 +11,7 @@ import {
   AlertCircle, Clock, Calendar, Camera, Image, Plus, Pencil,
   Trash2, Star,
 } from "lucide-react";
-import { adminAPI } from "../../services/api";
+import { adminAPI, adminAuthAPI } from "../../services/api";
 import { useData, CATEGORY_COLORS } from "../../context/dataConstants";
 
 // ✅ Safe import with fallback
@@ -591,9 +591,12 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("alumniUser");
+  const handleLogout = async () => {
+    try {
+      await adminAuthAPI.logout(); // clears HttpOnly cookie on the server
+    } catch (err) {
+      console.error("Logout error", err);
+    }
     navigate("/admin");
   };
 
@@ -628,19 +631,19 @@ const AdminDashboard = () => {
   const totalAlbums = Object.values(albumsData).reduce((s, y) => s + y.albums.length, 0);
 
   const TABS = [
-    { key: "alumni",   Icon: Users,    label: "Alumni",    badge: stats.totalAlumni },
-    { key: "donations",Icon: FileText, label: "Donations", badge: stats.totalDonatedAmount },
-    { key: "events",   Icon: Calendar, label: "Events",    badge: events.length },
-    { key: "albums",   Icon: Camera,   label: "Albums",    badge: totalAlbums },
+    { key: "alumni", Icon: Users, label: "Alumni", badge: stats.totalAlumni },
+    { key: "donations", Icon: FileText, label: "Donations", badge: stats.totalDonatedAmount },
+    { key: "events", Icon: Calendar, label: "Events", badge: events.length },
+    { key: "albums", Icon: Camera, label: "Albums", badge: totalAlbums },
   ];
 
   const STAT_CARDS = [
-    { icon: "👥", val: stats.totalAlumni,       label: "Total Alumni" },
-    { icon: "⏳", val: stats.pendingAlumni,      label: "Pending Approval" },
-    { icon: "💰", val: stats.totalDonatedAmount,     label: "Total Donations" },
+    { icon: "👥", val: stats.totalAlumni, label: "Total Alumni" },
+    { icon: "⏳", val: stats.pendingAlumni, label: "Pending Approval" },
+    { icon: "💰", val: stats.totalDonatedAmount, label: "Total Donations" },
     { icon: "✅", val: stats.completedDonations, label: "Completed" },
-    { icon: "📅", val: events.length,            label: "Events" },
-    { icon: "📸", val: totalAlbums,              label: "Albums" },
+    { icon: "📅", val: events.length, label: "Events" },
+    { icon: "📸", val: totalAlbums, label: "Albums" },
   ];
 
   if (loading) return (
