@@ -3,7 +3,7 @@
 // ✅ Falls back gracefully
 // ✅ Shows helpful error message if API unavailable
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -11,8 +11,9 @@ import {
   AlertCircle, Clock, Calendar, Camera, Image, Plus, Pencil,
   Trash2, Star,
 } from "lucide-react";
-import { adminAPI, adminAuthAPI } from "../../services/api";
+import { adminAPI } from "../../services/api";
 import { useData, CATEGORY_COLORS } from "../../context/dataConstants";
+import { useAuth } from "../../context/AuthContext";
 
 // ✅ Safe import with fallback
 let donationsAPI;
@@ -542,6 +543,7 @@ const AlbumsTab = ({ onError, onSuccess }) => {
 
 // ─── MAIN DASHBOARD ───────────────────────────────────────────────────────────
 const AdminDashboard = () => {
+  const { logout} = useAuth();
   const navigate = useNavigate();
   const { events, albumsData } = useData();
   const [activeTab, setActiveTab] = useState("alumni");
@@ -591,14 +593,10 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await adminAuthAPI.logout(); // clears HttpOnly cookie on the server
-    } catch (err) {
-      console.error("Logout error", err);
-    }
+  const handleLogout = useCallback( () => {
+    logout();
     navigate("/admin");
-  };
+  },[logout, navigate]);
 
   const handleApprove = async (id) => {
     try {
