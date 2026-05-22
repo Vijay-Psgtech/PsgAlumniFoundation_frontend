@@ -3,16 +3,19 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Banner from "./Banner";
 import About from "./About";
-import Vision from "./Vision";
-import Values from "./Values";
-import Mission from "./Mission";
+import InitiativesPage from "../pages/Initiativespage";
+import EngagementPage from "../pages/Engagementpage";
+import Contribute from "../pages/Contribute";
 
-const features = [
-  {emoji:"👥",title:"Alumni Directory",desc:"Browse and connect with global alumni network"},
-  {emoji:"🌍",title:"World Map",desc:"See where alumni are located worldwide"},
-  {emoji:"👤",title:"My Profile",desc:"Keep your information up to date"},
-  {emoji:"🔒",title:"Secure Access",desc:"Protected with modern authentication"},
-];
+// import Values from "./Values";
+// import Mission from "./Mission";
+
+// const features = [
+//   {emoji:"👥",title:"Alumni Directory",desc:"Browse and connect with global alumni network"},
+//   {emoji:"🌍",title:"World Map",desc:"See where alumni are located worldwide"},
+//   {emoji:"👤",title:"My Profile",desc:"Keep your information up to date"},
+//   {emoji:"🔒",title:"Secure Access",desc:"Protected with modern authentication"},
+// ];
 
 const engagementInitiatives = [
   {
@@ -251,7 +254,7 @@ const HomePage = () => {
       <About/>
       
       {/* Alumni Network Section */}
-      <section className="alumni-cta-s">
+      {/* <section className="alumni-cta-s">
         <div className="cta-inner">
           <div className="cta-grid">
             <motion.div initial={{opacity:0,x:-28}} whileInView={{opacity:1,x:0}} transition={{duration:.8}} viewport={{once:true}}>
@@ -289,7 +292,7 @@ const HomePage = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Engagement & Initiatives Section */}
       <section className="engagement-section">
@@ -341,10 +344,12 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-
-      <Vision/>
-      <Values/>
-      <Mission/>
+<InitiativesPage/>
+<EngagementPage/>
+<Contribute/>
+      
+      {/* <Values/>
+      <Mission/> */}
     </>
   );
 };

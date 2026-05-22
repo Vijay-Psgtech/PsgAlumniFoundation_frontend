@@ -15,15 +15,13 @@ import Objectives from "./pages/Objectives";
 import Engagement from "./pages/Engagementpage";
 import Initiatives from "./pages/Initiativespage";
 import Gallery from "./pages/Gallerypage";
-import OfficeBearersPage from "./pages/OfficeBearersPage";
-import Patrons from "./pages/PatronsPage";
-import CouncilPage from "./pages/Councilpage";
 import Contact from "./pages/ContactUsPage";
 import DonatePage from "./pages/DonatePage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import EventsCalendarPage from "./pages/EventsCalendarPage";
 import YearAlbumsPage from "./pages/YearAlbumsPage";
+import Contribute from "./pages/Contribute";
 
 // ── ALUMNI PAGES ────────────────────────────────────────────────
 import AlumniRegistration from "./pages/alumni/AlumniRegistration";
@@ -126,11 +124,9 @@ function AppRoutes() {
           <Route path="engagement" element={<Engagement />} />
           <Route path="initiatives" element={<Initiatives />} />
           <Route path="gallery" element={<Gallery />} />
-          <Route path="patrons" element={<Patrons />} />
-          <Route path="council" element={<CouncilPage />} />
-          <Route path="officebearers" element={<OfficeBearersPage />} />
           <Route path="contact" element={<Contact />} />
           <Route path="donate" element={<DonatePage />} />
+          <Route path="contribute" element={<Contribute />} />
           
           {/* ══════════════════════════════════════════════════════════════ */}
           {/* EVENTS ROUTES */}

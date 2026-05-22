@@ -5,64 +5,67 @@ import { Heart, Users, Handshake, ArrowRight, CheckCircle } from "lucide-react";
 const engagementPaths = [
   {
     id: 1,
+    section: "4a",
     icon: Heart,
     title: "Engage as a Donor",
     color: "#c9a84c",
     description:
-      "Your contribution directly supports scholarships, research, infrastructure development, and capacity-building initiatives.",
+      "Your contribution directly supports scholarships, research, infrastructure development, and capacity-building initiatives across PSG institutions.",
     benefits: [
       "Direct support to deserving students",
-      "Fund research and innovation centers",
+      "Fund research and innovation initiatives",
       "Strengthen institutional infrastructure",
-      "Build centers of excellence",
       "Support capacity-building programs",
-      "Tax-deductible donations",
+      "CSR initiatives aligned with impact",
+      "Enable educational opportunities"
     ],
     cta: "Start Donating",
     highlight:
-      "Every contribution, regardless of size, creates opportunities for deserving students and strengthens the future of education and innovation.",
+      "Every contribution, regardless of size, creates opportunities for deserving students and strengthens the future of education and innovation. Corporates shall partner through CSR initiatives aligned with educational and social impact objectives."
   },
   {
     id: 2,
+    section: "4b",
     icon: Users,
     title: "Engage as a Mentor",
     color: "#7eb8f7",
     description:
-      "Share your expertise and experience with the next generation of leaders through structured mentorship programs.",
+      "The Foundation welcomes experienced professionals, academicians, entrepreneurs, and industry experts to mentor students and faculty.",
     benefits: [
-      "Career guidance and counseling",
-      "Technical mentoring sessions",
-      "Leadership development workshops",
-      "Industry insights sharing",
-      "Networking opportunities",
-      "Shape future professionals",
+      "Career guidance",
+      "Technical mentoring",
+      "Leadership sessions",
+      "Workshops and training programmes",
+      "Shape future-ready graduates",
+      "Strengthen learning ecosystem"
     ],
     cta: "Become a Mentor",
     highlight:
-      "Mentorship plays a significant role in shaping future-ready graduates and strengthening the PSG learning ecosystem.",
+      "Mentorship plays a significant role in shaping future-ready graduates and strengthening the PSG learning ecosystem. Connect with passionate students eager to learn from your expertise."
   },
   {
     id: 3,
+    section: "4c",
     icon: Handshake,
     title: "Engage as a Partner",
     color: "#7edfa0",
     description:
-      "Collaborate as a long-term partner in advancing education, research, innovation, and community development.",
+      "The Foundation invites alumni, industries, institutions, and corporate organizations to collaborate as long-term partners in advancing education, research, innovation, and community development.",
     benefits: [
       "Strategic partnership opportunities",
       "Industry-academia collaboration",
       "Research partnerships",
-      "Corporate CSR alignment",
       "Long-term sustainable impact",
-      "Brand visibility and recognition",
+      "Support institutional growth",
+      "Strengthen support ecosystem"
     ],
     cta: "Become a Partner",
     highlight:
-      "Strategic partnerships help create sustainable impact while strengthening the support ecosystem around PSG institutions.",
-  },
+      "Strategic partnerships help create sustainable impact while strengthening the support ecosystem around PSG College of Technology and PSG Polytechnic College."
+  }
 ];
 
-const EnagementPage = () => {
+const EngagementPage = () => {
   const [expandedId, setExpandedId] = useState(1);
 
   return (
@@ -71,7 +74,7 @@ const EnagementPage = () => {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
         
         .eng-hero {
-          background: linear-gradient(165deg, #0a0e1a 0%, #0d1428 100%);
+          background: linear-gradient(165deg, #0a0e1f 0%, #0d1428 100%);
           padding: 120px 24px;
           font-family: 'Outfit', sans-serif;
           position: relative;
@@ -105,24 +108,25 @@ const EnagementPage = () => {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.25em;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(201, 168, 76, 0.65);
-          margin-bottom: 20px;
+          color: rgba(201, 168, 76, 0.72);
+          margin-bottom: 24px;
         }
         
-        .eng-eyebrow::before, .eng-eyebrow::after {
+        .eng-eyebrow::before,
+        .eng-eyebrow::after {
           content: '';
-          width: 32px;
+          width: 28px;
           height: 1.5px;
-          background: linear-gradient(90deg, rgba(201, 168, 76, 0.4), rgba(201, 168, 76, 0.1));
+          background: rgba(201, 168, 76, 0.5);
         }
         
         .eng-h1 {
           font-family: 'Playfair Display', serif;
-          font-size: clamp(42px, 6vw, 72px);
+          font-size: clamp(48px, 6vw, 72px);
           font-weight: 800;
           color: #f2ede3;
           line-height: 1.08;
@@ -135,13 +139,14 @@ const EnagementPage = () => {
           background: linear-gradient(130deg, #c9a84c, #f0d870);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         
         .eng-sub {
           font-size: 16px;
           font-weight: 300;
-          color: rgba(200, 215, 240, 0.5);
-          max-width: 650px;
+          color: rgba(200, 215, 240, 0.68);
+          max-width: 700px;
           margin: 0 auto;
           line-height: 1.75;
         }
@@ -207,6 +212,20 @@ const EnagementPage = () => {
           height: 32px;
         }
         
+        .eng-header-text {
+          flex: 1;
+        }
+        
+        .eng-section-label {
+          display: block;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: rgba(201, 168, 76, 0.72);
+          margin-bottom: 6px;
+        }
+        
         .eng-header-text h3 {
           font-family: 'Playfair Display', serif;
           font-size: 24px;
@@ -219,7 +238,7 @@ const EnagementPage = () => {
         .eng-header-text p {
           font-size: 14px;
           font-weight: 300;
-          color: rgba(200, 215, 240, 0.6);
+          color: rgba(200, 215, 240, 0.65);
           line-height: 1.6;
         }
         
@@ -242,7 +261,7 @@ const EnagementPage = () => {
         }
         
         .eng-card.active .eng-content {
-          max-height: 600px;
+          max-height: 700px;
         }
         
         .eng-content-inner {
@@ -251,15 +270,15 @@ const EnagementPage = () => {
         }
         
         .eng-highlight {
-          padding: 20px 24px;
+          padding: 22px 24px;
           margin-bottom: 28px;
           background: linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.03));
           border-left: 3px solid var(--eng-color);
           border-radius: 6px;
           font-size: 14px;
           font-weight: 300;
-          color: rgba(200, 215, 240, 0.7);
-          line-height: 1.7;
+          color: rgba(200, 215, 240, 0.75);
+          line-height: 1.75;
           font-style: italic;
         }
         
@@ -268,18 +287,18 @@ const EnagementPage = () => {
         }
         
         .eng-benefits-title {
-          font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           color: rgba(201, 168, 76, 0.8);
-          margin-bottom: 16px;
+          margin-bottom: 18px;
         }
         
         .eng-benefits-list {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 14px;
         }
         
         .eng-benefit-item {
@@ -287,8 +306,8 @@ const EnagementPage = () => {
           align-items: flex-start;
           gap: 10px;
           font-size: 13px;
-          color: rgba(200, 215, 240, 0.65);
-          line-height: 1.5;
+          color: rgba(200, 215, 240, 0.7);
+          line-height: 1.6;
         }
         
         .eng-benefit-item svg {
@@ -296,7 +315,7 @@ const EnagementPage = () => {
           height: 16px;
           color: var(--eng-color);
           flex-shrink: 0;
-          margin-top: 3px;
+          margin-top: 2px;
         }
         
         .eng-cta {
@@ -331,26 +350,84 @@ const EnagementPage = () => {
           text-align: center;
         }
         
-        .eng-why-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(28px, 4vw, 42px);
-          font-weight: 700;
-          color: #f2ede3;
+        .eng-why::before {
+          content: '';
+          display: block;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.5), transparent);
           margin-bottom: 20px;
-          line-height: 1.2;
         }
         
-        .eng-why-text 
+        .eng-why-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 700;
+          color: #f2ede3;
+          margin-bottom: 24px;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+        }
         
+        .eng-why-title em {
+          font-style: italic;
+          background: linear-gradient(130deg, #c9a84c, #f0d870);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
         
+        .eng-why-text {
+          font-size: 15px;
+          font-weight: 300;
+          color: rgba(200, 215, 240, 0.75);
+          max-width: 800px;
+          margin: 0 auto;
+          line-height: 1.8;
+        }
         
         @media (max-width: 820px) {
-          .eng-card-header { padding: 24px 20px; }
-          .eng-card-left { gap: 16px; }
-          .eng-icon-box { width: 52px; height: 52px; }
-          .eng-content-inner { padding: 0 20px 20px; }
-          .eng-benefits-list { grid-template-columns: 1fr; }
-          .eng-why { padding: 40px 20px; }
+          .eng-card-header {
+            padding: 24px 20px;
+          }
+          
+          .eng-card-left {
+            gap: 16px;
+          }
+          
+          .eng-icon-box {
+            width: 52px;
+            height: 52px;
+          }
+          
+          .eng-icon-box svg {
+            width: 28px;
+            height: 28px;
+          }
+          
+          .eng-content-inner {
+            padding: 0 20px 20px;
+          }
+          
+          .eng-benefits-list {
+            grid-template-columns: 1fr;
+          }
+          
+          .eng-why {
+            padding: 40px 20px;
+          }
+        }
+        
+        @media (max-width: 600px) {
+          .eng-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+          }
+          
+          .eng-chevron {
+            align-self: flex-end;
+            margin-top: -32px;
+          }
         }
       `}</style>
 
@@ -367,9 +444,7 @@ const EnagementPage = () => {
               Ways to <em>Get Involved</em>
             </h1>
             <p className="eng-sub">
-              Join the PSG Tech Alumni Foundation community and make a
-              meaningful impact on education, innovation, and student
-              development through various engagement pathways.
+              Join the PSG Tech Alumni Foundation community and make a meaningful impact on education, innovation, research, and student development through various engagement pathways.
             </p>
           </motion.div>
 
@@ -402,6 +477,7 @@ const EnagementPage = () => {
                         <Icon />
                       </div>
                       <div className="eng-header-text">
+                        <span className="eng-section-label">{path.section}</span>
                         <h3>{path.title}</h3>
                         <p>{path.description}</p>
                       </div>
@@ -459,13 +535,9 @@ const EnagementPage = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="eng-why-title text-blue-100 ">Why Engage With Us?</h2>
-            <p className="eng-why-text text-amber-100">
-              The PSG Tech Alumni Foundation welcomes experienced professionals,
-              academicians, entrepreneurs, and industry experts to collaborate
-              in advancing education, research, innovation, and community
-              development. Together, we create sustainable impact and strengthen
-              the PSG learning ecosystem for future generations.
+            <h2 className="eng-why-title">Why <em>Engage</em> With Us?</h2>
+            <p className="eng-why-text">
+              The PSG Tech Alumni Foundation welcomes experienced professionals, academicians, entrepreneurs, and industry experts to collaborate in advancing education, research, innovation, and community development. Together, we create sustainable impact and strengthen the PSG learning ecosystem for future generations.
             </p>
           </motion.div>
         </div>
@@ -474,4 +546,4 @@ const EnagementPage = () => {
   );
 };
 
-export default EnagementPage;
+export default EngagementPage;
