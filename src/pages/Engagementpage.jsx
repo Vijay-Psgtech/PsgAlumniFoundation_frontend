@@ -367,7 +367,7 @@ const EnagementPage = () => {
               Ways to <em>Get Involved</em>
             </h1>
             <p className="eng-sub">
-              Join the PSG Tech Alumni Foundation community and make a
+              Join the PSG Tech Alumni Association community and make a
               meaningful impact on education, innovation, and student
               development through various engagement pathways.
             </p>
@@ -461,7 +461,7 @@ const EnagementPage = () => {
           >
             <h2 className="eng-why-title text-blue-100 ">Why Engage With Us?</h2>
             <p className="eng-why-text text-amber-100">
-              The PSG Tech Alumni Foundation welcomes experienced professionals,
+              The PSG Tech Alumni Association welcomes experienced professionals,
               academicians, entrepreneurs, and industry experts to collaborate
               in advancing education, research, innovation, and community
               development. Together, we create sustainable impact and strengthen

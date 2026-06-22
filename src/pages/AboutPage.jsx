@@ -6,9 +6,9 @@ import usePageTitle from "../hooks/usePageTitle";
 
 
 const timelineData = [
-  { title: "Heritage of Excellence", sub: "Since foundation", side: "left" },
+  { title: "Heritage of Excellence", sub: "Since Association", side: "left" },
   { title: "Global Chapters", sub: "Global network expansion", side: "right" },
-  { title: "Foundation Registered", sub: "19th October 2016", side: "left" },
+  { title: "Association Registered", sub: "19th October 2016", side: "left" },
   { title: "First Scholarships", sub: "Recipients awarded", side: "right" },
   { title: "GRD Museum Initiative", sub: "Major projects launched", side: "left" },
 ];
@@ -114,16 +114,16 @@ export default function AboutPage() {
         <div className="ap-inner">
           <div className="ap-hero">
             <motion.div variants={fade(0)} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <div className="ap-ey">PSG Tech Alumni Foundation</div>
+              <div className="ap-ey">PSG Tech Alumni Association</div>
               <h1 className="ap-h1">Connecting <em>Techians</em><br />Across the Globe</h1>
               <p className="ap-lead">Celebrating a legacy of excellence — connecting alumni globally with mentorship, opportunities, and purpose-driven initiatives since 2016.</p>
               <div className="ap-btns">
                 <a href="/donate" className="btn-g">Donate <ArrowRight size={15} /></a>
-                <a href="/psg-tech-foundation-brochure.pdf" className="btn-gh"><Download size={13} /> Brochure</a>
+                <a href="/psg-tech-Association-brochure.pdf" className="btn-gh"><Download size={13} /> Brochure</a>
               </div>
             </motion.div>
             <motion.div className="hero-iw" variants={fade(.12)} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <div className="hero-if"><img src={AboutImg} alt="PSG Tech Alumni Foundation" /></div>
+              <div className="hero-if"><img src={AboutImg} alt="PSG Tech Alumni Association" /></div>
               <div className="hc hc-tl" /><div className="hc hc-br" />
             </motion.div>
           </div>
@@ -132,16 +132,16 @@ export default function AboutPage() {
             <article>
               <div className="sl">Our Story</div>
               <h2 className="ap-h2">Built on <em>Legacy</em>, Driven by Purpose</h2>
-              <p className="ap-p">The PSG TECH Alumni Foundation, a long felt need for a financial arm of PSG Tech Alumni Association, was registered on <strong>19th October 2016</strong> as a not-for-profit Trust under the laws of the State of Tamil Nadu.</p>
-              <p className="ap-p">The Foundation was established to provide an avenue through which alumni and well-wishers may contribute financially through gifts, grants, and bequests to benefit present and future students — providing scholarship assistance and funding special projects like PSG-GRD Science & Technology Museum and Research Centre.</p>
-              <p className="ap-p">The Foundation's purpose is to receive gifts for the College / Alumni Association and to hold these contributed funds in perpetual endowment. Only the accrued interest and/or income from the funds is expended unless otherwise designated.</p>
-              <p className="ap-p">The Foundation is managed by a Board of Trustees comprising six senior alumni and three ex-officio Trustees. The Board provides direction for major functions necessary to carry out the mission of the Foundation.</p>
+              <p className="ap-p">The PSG TECH Alumni Association, a long felt need for a financial arm of PSG Tech Alumni Association, was registered on <strong>19th October 2016</strong> as a not-for-profit Trust under the laws of the State of Tamil Nadu.</p>
+              <p className="ap-p">The Association was established to provide an avenue through which alumni and well-wishers may contribute financially through gifts, grants, and bequests to benefit present and future students — providing scholarship assistance and funding special projects like PSG-GRD Science & Technology Museum and Research Centre.</p>
+              <p className="ap-p">The Association's purpose is to receive gifts for the College / Alumni Association and to hold these contributed funds in perpetual endowment. Only the accrued interest and/or income from the funds is expended unless otherwise designated.</p>
+              <p className="ap-p">The Association is managed by a Board of Trustees comprising six senior alumni and three ex-officio Trustees. The Board provides direction for major functions necessary to carry out the mission of the Association.</p>
               <ol className="ap-ol">
                 <li>Award of Scholarships to the needy and deserving students.</li>
                 <li>Setting up and Managing the PSG-GRD Museum at Neelambur campus.</li>
                 <li>Any other activity to support PSG Tech to achieve excellence in education and research including fellowships, centers of excellence, new programs, and special projects.</li>
               </ol>
-              <p className="ap-p" style={{ marginTop: 18 }}>The foundation abides by rules and regulations followed in the <strong>Indian Trusts Act, 1882</strong>.</p>
+              <p className="ap-p" style={{ marginTop: 18 }}>The Association abides by rules and regulations followed in the <strong>Indian Trusts Act, 1882</strong>.</p>
 
               <div className="sl" style={{ marginTop: 48 }}>Our Journey</div>
               <div className="tl-wrap">
@@ -195,7 +195,7 @@ export default function AboutPage() {
           </div>
 
           <motion.div className="cb" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: .75 }} viewport={{ once: true }}>
-            <div><div className="cb-h">Support the Foundation</div><div className="cb-p">Your gift helps transform student lives — scholarships, labs, and more.</div></div>
+            <div><div className="cb-h">Support the Association</div><div className="cb-p">Your gift helps transform student lives — scholarships, labs, and more.</div></div>
             <div className="ap-btns">
               <a href="/donate" className="btn-g">Donate Now <ArrowRight size={15} /></a>
               <a href="/contact" className="btn-gh">Contact Us</a>

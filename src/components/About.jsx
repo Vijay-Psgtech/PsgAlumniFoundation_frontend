@@ -44,7 +44,7 @@ const About = () => {
           <div className="about-grid">
             <motion.div className="img-wrap" variants={fade(0)} initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}}>
               <div className="img-frame">
-                <img src="/about.webp" alt="PSG Tech Alumni Foundation"/>
+                <img src="/about.webp" alt="PSG Tech Alumni Association"/>
               </div>
               <div className="corner c-tl"/><div className="corner c-br"/>
               <div className="img-badge">
@@ -57,16 +57,16 @@ const About = () => {
                 <div className="section-eyebrow">About Us</div>
               </motion.div>
               <motion.h2 className="about-h2" variants={fade(.22)} initial="hidden" whileInView="visible" viewport={{once:true}}>
-                PSG Tech Alumni <em>Foundation</em>
+                PSG Tech Alumni <em>Association</em>
               </motion.h2>
               <motion.p className="about-p" variants={fade(.32)} initial="hidden" whileInView="visible" viewport={{once:true}}>
-                The PSG TECH Alumni Foundation, a long-felt need for a financial arm of PSG Tech Alumni Association, was registered on <span className="about-hl">19th October 2016</span> as a not-for-profit Trust under the Indian Trust Act 1882 in Tamil Nadu.
+                The PSG TECH Alumni Association, a long-felt need for a financial arm of PSG Tech Alumni Association, was registered on <span className="about-hl">19th October 2016</span> as a not-for-profit Trust under the Indian Trust Act 1882 in Tamil Nadu.
               </motion.p>
               <motion.p className="about-p" variants={fade(.4)} initial="hidden" whileInView="visible" viewport={{once:true}}>
-                The Foundation is a dedicated organization for alumni, corporates, and well-wishers to collaborate and contribute towards the progress of PSG College of Technology & Polytechnic College. With transparency, accountability, and institutional development at its core, the Foundation actively supports initiatives that strengthen education, research, innovation, and scientific learning within the PSG ecosystem.
+                The Association is a dedicated organization for alumni, corporates, and well-wishers to collaborate and contribute towards the progress of PSG College of Technology & Polytechnic College. With transparency, accountability, and institutional development at its core, the Association actively supports initiatives that strengthen education, research, innovation, and scientific learning within the PSG ecosystem.
               </motion.p>
               <motion.p className="about-p" variants={fade(.48)} initial="hidden" whileInView="visible" viewport={{once:true}}>
-                The Foundation is governed by a Board of Trustees comprising distinguished alumni and institutional leaders who drive our mission forward with excellence and dedication.
+                The Association is governed by a Board of Trustees comprising distinguished alumni and institutional leaders who drive our mission forward with excellence and dedication.
               </motion.p>
               <motion.div className="about-quote-wrap" variants={fade(.56)} initial="hidden" whileInView="visible" viewport={{once:true}}>
                 <div className="about-quote">"Come Curious. Leave Connected."</div>

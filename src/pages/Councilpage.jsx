@@ -251,7 +251,7 @@ const CouncilPage = () => {
                 variants={itemVariants}
                 className="text-lg md:text-xl text-slate-300 leading-relaxed font-light mb-8"
               >
-                Our council members represent decades of combined excellence in academia, industry, and institutional leadership. Their dedication and mentorship form the foundation of PSG Tech's commitment to fostering innovation, integrity, and excellence in engineering education.
+                Our council members represent decades of combined excellence in academia, industry, and institutional leadership. Their dedication and mentorship form the Association of PSG Tech's commitment to fostering innovation, integrity, and excellence in engineering education.
               </motion.p>
               <motion.div
                 variants={itemVariants}

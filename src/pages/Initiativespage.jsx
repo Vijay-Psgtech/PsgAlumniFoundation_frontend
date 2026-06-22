@@ -169,7 +169,7 @@ const InitiativesPage = () => {
             <div className="init-museum-content">
               <h2 className="init-museum-title">🏛️ PSG GRD Museum of Science & Technology</h2>
               <p className="init-museum-text">
-                A landmark initiative jointly established by PSG & Sons' Charities and the PSG Tech Alumni Foundation. Dedicated to the memory of Dr. G.R. Damodaran, the visionary architect of PSG institutions, the museum promotes scientific curiosity, experiential learning, and public engagement through immersive exhibits and technology-driven educational experiences.
+                A landmark initiative jointly established by PSG & Sons' Charities and the PSG Tech Alumni Association. Dedicated to the memory of Dr. G.R. Damodaran, the visionary architect of PSG institutions, the museum promotes scientific curiosity, experiential learning, and public engagement through immersive exhibits and technology-driven educational experiences.
               </p>
               <p className="init-museum-text">
                 Spread across over 30,000 square feet with exhibits in Science & Technology, the museum serves as a vibrant learning destination for students, educators, researchers, and visitors of all age groups.

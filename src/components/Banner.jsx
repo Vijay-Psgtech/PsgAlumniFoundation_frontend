@@ -235,7 +235,7 @@ const Banner = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.08 }}>
             <div className="banner-eyebrow">
               <span className="eyebrow-dot" />
-              PSG Tech Alumni Foundation · Est. 2016
+              PSG Tech Alumni Association · Est. 2016
             </div>
           </motion.div>
 
