@@ -426,11 +426,11 @@ export default function NavBar() {
         <div className="nav-inner">
           <Link to="/" className="nav-logo" onClick={closeAll}>
             <div className="nav-logo-img-wrap">
-              <img src={Logo} alt="PSG Tech Alumni Foundation" className="nav-logo-img" />
+              <img src={Logo} alt="PSG Tech Alumni Association" className="nav-logo-img" />
             </div>
             <div className="nav-logo-text">
               <div className="nav-logo-main">PSG TECH</div>
-              <div className="nav-logo-sub">Alumni Foundation</div>
+              <div className="nav-logo-sub">Alumni Association</div>
             </div>
           </Link>
 

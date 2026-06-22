@@ -21,7 +21,7 @@ const galleryItems = [
   { id: 7, category: "Workshops", title: "Seminar on Innovation", image: "🚀", desc: "Promoting innovation and R&D" },
   { id: 8, category: "Museum", title: "Interactive Learning Zone", image: "⚡", desc: "Students exploring technology" },
   { id: 9, category: "Scholarships", title: "Merit Award Ceremony", image: "🏆", desc: "Honoring academic excellence" },
-  { id: 10, category: "Events", title: "Foundation Day Celebration", image: "🎉", desc: "Annual foundation celebration" },
+  { id: 10, category: "Events", title: "Association Day Celebration", image: "🎉", desc: "Annual Association celebration" },
   { id: 11, category: "Initiatives", title: "Industry Collaboration", image: "🤝", desc: "Partnership with leading companies" },
   { id: 12, category: "Workshops", title: "Leadership Workshop", image: "👨‍💼", desc: "Developing future leaders" }
 ];
@@ -337,7 +337,7 @@ const GalleryPage = () => {
               Our Journey in <em>Pictures</em>
             </h1>
             <p className="gallery-sub">
-              Explore moments from our foundation initiatives, scholarship programs, workshops, and alumni engagement activities.
+              Explore moments from our Association initiatives, scholarship programs, workshops, and alumni engagement activities.
             </p>
           </motion.div>
 

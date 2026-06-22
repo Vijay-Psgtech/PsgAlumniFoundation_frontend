@@ -81,7 +81,7 @@ const ObjectivesPage = () => {
             <div className="obj-eyebrow">Objectives</div>
             <h1 className="obj-h1">Our Commitment to <em>Excellence</em></h1>
             <p className="obj-sub">
-              The PSG Tech Alumni Foundation is dedicated to advancing educational excellence through strategic initiatives and transformative programs that create lasting impact.
+              The PSG Tech Alumni Association is dedicated to advancing educational excellence through strategic initiatives and transformative programs that create lasting impact.
             </p>
           </motion.div>
 
@@ -98,9 +98,9 @@ const ObjectivesPage = () => {
           </motion.div>
 
           <motion.div className="obj-section" initial={{opacity:0,y:40}} whileInView={{opacity:1,y:0}} transition={{duration:.75}} viewport={{once:true}}>
-            <h2 className="obj-section-title">Our Foundation Principles</h2>
+            <h2 className="obj-section-title">Our Association Principles</h2>
             <p className="obj-section-text">
-              The PSG Tech Alumni Foundation operates on the core principle that <span className="obj-highlight">no deserving student should be deprived of quality education due to financial limitations</span>. Through scholarships, capacity-building programs, and research initiatives, we empower the next generation of leaders and innovators. Our structured philanthropic approach ensures transparency, accountability, and sustainable impact across all educational and institutional development initiatives.
+              The PSG Tech Alumni Association operates on the core principle that <span className="obj-highlight">no deserving student should be deprived of quality education due to financial limitations</span>. Through scholarships, capacity-building programs, and research initiatives, we empower the next generation of leaders and innovators. Our structured philanthropic approach ensures transparency, accountability, and sustainable impact across all educational and institutional development initiatives.
             </p>
           </motion.div>
         </div>

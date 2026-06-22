@@ -31,9 +31,9 @@ const Footer = () => {
         <div className="footer-grid">
           {/* About */}
           <div className="footer-col">
-            <h4>About Foundation</h4>
+            <h4>About Association</h4>
             <p>
-              PSG Tech Alumni Foundation, registered in 2016, is a non-profit trust dedicated to strengthening education, innovation, and research at PSG College of Technology.
+              PSG Tech Alumni Association, registered in 2016, is a non-profit trust dedicated to strengthening education, innovation, and research at PSG College of Technology.
             </p>
           </div>
 
@@ -72,7 +72,7 @@ const Footer = () => {
             </div>
             <div className="contact-item">
               <Mail size={18} className="contact-icon" />
-              <a href="mailto:admin@psgtechalumnifoundation.org">admin@psgtechalumnifoundation.org</a>
+              <a href="mailto:admin@psgtechalumniAssociation.org">admin@psgtechalumniAssociation.org</a>
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@ const Footer = () => {
 
         <div className="footer-bottom">
           <div className="footer-copyright">
-            © 2024 PSG Tech Alumni Foundation. All rights reserved. | Registered as Non-Profit Trust (19th October 2016)
+            © 2024 PSG Tech Alumni Association. All rights reserved. | Registered as Non-Profit Trust (19th October 2016)
           </div>
           <div className="footer-social">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" title="Facebook">

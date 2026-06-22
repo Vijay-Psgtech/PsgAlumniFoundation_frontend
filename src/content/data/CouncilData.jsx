@@ -138,7 +138,7 @@ export const Council = [
     role: "Governing Council",
     title: "Founding Board Member",
     batch: "BE '84",
-    bio: "Pioneering alumnus whose contributions have been instrumental in PSG Tech's foundation.",
+    bio: "Pioneering alumnus whose contributions have been instrumental in PSG Tech's Association.",
     image: patronImg14,
   },
   {

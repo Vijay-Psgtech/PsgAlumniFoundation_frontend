@@ -44,7 +44,7 @@ const Vision = () => (
             To strive to be the <strong>major support for PSG College of Technology & Polytechnic College's mission</strong> of delivering <strong>world-class education and an exceptional learning environment</strong> for every student.
           </p>
           <div className="vision-divider"/>
-          <div className="vision-footer">Foundation Core Goal</div>
+          <div className="vision-footer">Association Core Goal</div>
           <div className="vision-stats">
             {[{v:"Excellence",l:"First Priority"},{v:"Sustainable",l:"Impact Model"}].map(s=>(
               <div className="vstat" key={s.l}><div className="vstat-val">{s.v}</div><div className="vstat-lbl">{s.l}</div></div>
