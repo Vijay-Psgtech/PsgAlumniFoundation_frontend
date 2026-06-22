@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Logo from "../assets/Images/staffImages/logo.jpg";
+import Logo from "/logo.jpg";
 
 export default function NavBar() {
   const { user, logout } = useAuth();
