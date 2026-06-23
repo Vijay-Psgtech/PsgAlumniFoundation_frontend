@@ -63,6 +63,12 @@ const AdminNotifications = lazy(
   () => import("./pages/admin/AdminNotifications"),
 );
 
+// ═══════════════════════════════════════════════════════════════════════
+// ✅ CAMPAIGN PAGES - Public campaigns (No auth needed)
+// ═══════════════════════════════════════════════════════════════════════
+const CampaignsPage = lazy(() => import("./pages/alumni/CampaignsPage"));
+const CampaignFormPage = lazy(() => import("./pages/alumni/CampaignFormPage"));
+
 // ── Redirects logged-in ALUMNI away from login/register ──────────
 const PublicOnlyRoute = ({ children }) => {
   const { user, authLoading } = useAuth();
@@ -137,6 +143,10 @@ export default function App() {
             <Route path="initiatives" element={<Initiatives />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="council" element={<CouncilPage />} />
+
+            {/* CAMPAIGN ROUTES - PUBLIC (No authentication needed)  */}
+            <Route path="/campaigns" element={<CampaignsPage />} />
+            <Route path="/campaign/:id" element={<CampaignFormPage />} />
 
             {/* ALUMNI AUTH */}
             <Route
